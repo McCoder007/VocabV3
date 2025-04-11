@@ -23,7 +23,7 @@ A mobile web application designed to help users learn vocabulary through an inte
 
 1. Clone this repository:
 ```
-git clone https://github.com/shawnmcgrath/VocabV3.git
+git clone https://github.com/McCoder007/VocabV3.git
 cd VocabV3
 ```
 
