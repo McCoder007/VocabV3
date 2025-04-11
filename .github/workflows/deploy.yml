@@ -44,13 +44,10 @@ jobs:
           cat config.js
 
       - name: Ensure API key is used in index.html
+        env:
+          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
         run: |
-          if grep -q "__GOOGLE_TTS_API_KEY__" index.html; then
-            sed -i "s/__GOOGLE_TTS_API_KEY__/${{ secrets.GOOGLE_TTS_API_KEY }}/g" index.html
-            echo "Updated API key in index.html"
-          else
-            echo "No placeholder found in index.html, no update needed"
-          fi
+          node update-api-key.js
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
