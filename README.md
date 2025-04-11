@@ -23,7 +23,7 @@ A mobile web application designed to help users learn vocabulary through an inte
 
 1. Clone this repository:
 ```
-git clone https://github.com/yourusername/VocabV3.git
+git clone https://github.com/shawnmcgrath/VocabV3.git
 cd VocabV3
 ```
 
@@ -56,7 +56,10 @@ export GOOGLE_TTS_API_KEY=your_api_key_here
 npm run build
 ```
 
-3. Serve the files using a local server.
+3. Serve the files using a local server:
+```
+npm run serve
+```
 
 ## License
 
