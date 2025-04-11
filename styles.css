@@ -33,6 +33,11 @@ body {
     flex-direction: column;
 }
 
+/* New class to hide the card initially */
+.vocabulary-card.card-hidden {
+    display: none;
+}
+
 .image-container {
     width: 100%;
     aspect-ratio: 1;

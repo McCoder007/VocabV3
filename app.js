@@ -31,13 +31,13 @@ function preloadImages() {
 
 function setupStartScreen() {
     // Ensure vocab card is hidden and start screen is shown initially
-    vocabularyCard.classList.add('hidden');
-    startScreen.classList.remove('hidden');
+    // vocabularyCard.classList.add('hidden'); // No longer needed, uses card-hidden
+    // startScreen.classList.remove('hidden'); // Start screen should be visible by default
 
     // Add listener to the start button
     startButton.addEventListener('click', () => {
-        startScreen.classList.add('hidden');
-        vocabularyCard.classList.remove('hidden');
+        startScreen.style.display = 'none'; // Hide start screen directly
+        vocabularyCard.classList.remove('card-hidden'); // Remove the card-hidden class
         initAppLogic(); // Call the main app initialization logic
     }, { once: true }); // Only allow starting once
 }
