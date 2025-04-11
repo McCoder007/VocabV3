@@ -35,11 +35,12 @@ jobs:
             echo "API key is set and available"
           fi
 
-      - name: Update API keys in all files
+      - name: Update API keys in files
         env:
           GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
         run: |
           node update-api-key.js
+          echo "API keys have been updated in the necessary files"
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
