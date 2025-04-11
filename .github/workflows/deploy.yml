@@ -40,6 +40,8 @@ jobs:
           GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
         run: |
           node update-api-key.js
+          # Also directly replace the API key in the force-set-api-key.js file
+          sed -i "s|API_KEY_PLACEHOLDER|$GOOGLE_TTS_API_KEY|g" force-set-api-key.js
           echo "API keys have been updated in the necessary files"
 
       - name: Verify API key replacement
@@ -59,6 +61,13 @@ jobs:
             echo "✅ API key found in config.js"
           else
             echo "❌ ERROR: API key NOT found in config.js"
+            exit 1
+          fi
+          # Check if the API key is in the force-set-api-key.js file
+          if grep -q "$GOOGLE_TTS_API_KEY" force-set-api-key.js; then
+            echo "✅ API key found in force-set-api-key.js"
+          else
+            echo "❌ ERROR: API key NOT found in force-set-api-key.js"
             exit 1
           fi
           # Check that the API placeholder is gone
