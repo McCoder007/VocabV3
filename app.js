@@ -53,43 +53,39 @@ function showNextWord() {
     // Prevent rapid clicking
     if (isTransitioning) return;
     isTransitioning = true;
-    
+
     // Reset state
     clearTimeout(countdownTimeout);
-    
-    // Reset translations
+
+    // Reset translations visibility
     translations.classList.add('hidden');
-    englishWord.textContent = '';
-    chineseWord.textContent = '';
-    
-    // Reset progress bar with a small delay to ensure proper transition
+    // Optionally clear content if needed, but hiding might be enough
+    // englishWord.textContent = '';
+    // chineseWord.textContent = '';
+
+    // Get current word data BEFORE updating the index
+    const wordToShow = vocabularyData[currentWordIndex];
+
+    // Update image IMMEDIATELY
+    vocabImage.src = wordToShow.image;
+
+    // Reset progress bar animation
+    countdownProgress.style.transition = 'none';
+    countdownProgress.style.transform = 'scaleX(1)';
+    // Force reflow might still be useful here to ensure reset applies before transition starts
+    void countdownProgress.offsetWidth;
+    countdownProgress.style.transition = 'transform 3s linear';
+
+    // Start countdown (which also handles the animation start)
+    startCountdown();
+
+    // Move to next word index for the *next* call
+    currentWordIndex = (currentWordIndex + 1) % vocabularyData.length;
+
+    // Allow transitions again after a short delay (can be adjusted)
     setTimeout(() => {
-        countdownProgress.style.transition = 'none';
-        countdownProgress.style.transform = 'scaleX(1)';
-        
-        // Force reflow to ensure the transition is reset
-        void countdownProgress.offsetWidth;
-        
-        // Restore transition
-        countdownProgress.style.transition = 'transform 3s linear';
-        
-        // Get current word
-        const currentWord = vocabularyData[currentWordIndex];
-        
-        // Update image
-        vocabImage.src = currentWord.image;
-        
-        // Start countdown
-        startCountdown();
-        
-        // Move to next word index
-        currentWordIndex = (currentWordIndex + 1) % vocabularyData.length;
-        
-        // Allow transitions again after a short delay
-        setTimeout(() => {
-            isTransitioning = false;
-        }, 300);
-    }, 10);
+        isTransitioning = false;
+    }, 100); // Reduced delay, adjust as needed
 }
 
 // Start the countdown timer
