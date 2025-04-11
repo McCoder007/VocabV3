@@ -10,7 +10,15 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="vocabulary-card">
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <h1>Vocabulary Flashcards</h1>
+            <p>Click start to begin learning!</p>
+            <button id="start-button" class="start-button">Start Learning</button>
+        </div>
+
+        <!-- Vocabulary Card (initially hidden) -->
+        <div id="vocabulary-card" class="vocabulary-card hidden">
             <div class="image-container">
                 <img id="vocab-image" src="" alt="Vocabulary image">
             </div>

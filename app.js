@@ -10,15 +10,31 @@ const chineseWord = document.getElementById('chinese-word');
 const translations = document.getElementById('translations');
 const countdownProgress = document.querySelector('.countdown-progress');
 const nextButton = document.getElementById('next-button');
+const startScreen = document.getElementById('start-screen');
+const startButton = document.getElementById('start-button');
+const vocabularyCard = document.getElementById('vocabulary-card');
 
 // State
 let currentWordIndex = 0;
 let countdownTimeout;
 let isTransitioning = false;
 
-// Initialize the app
-function init() {
-    // Instantiate the TTS Manager now that the config should be loaded
+function setupStartScreen() {
+    // Ensure vocab card is hidden and start screen is shown initially
+    vocabularyCard.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+
+    // Add listener to the start button
+    startButton.addEventListener('click', () => {
+        startScreen.classList.add('hidden');
+        vocabularyCard.classList.remove('hidden');
+        initAppLogic(); // Call the main app initialization logic
+    }, { once: true }); // Only allow starting once
+}
+
+// Initialize the main app logic (called after start button)
+function initAppLogic() {
+    // Instantiate the TTS Manager now that the config should be loaded and user interacted
     googleTTS = new GoogleTTSManager();
 
     // Set up event listeners
@@ -102,5 +118,5 @@ function showTranslations() {
     googleTTS.speak(currentWord.english);
 }
 
-// Initialize the app when the page loads
-document.addEventListener('DOMContentLoaded', init); 
+// Initialize the start screen setup when the page loads
+document.addEventListener('DOMContentLoaded', setupStartScreen); 
