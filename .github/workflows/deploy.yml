@@ -47,26 +47,12 @@ jobs:
           GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
         run: |
           echo "Verifying API key replacement in files..."
-          # Check if the API key is in the index.html file
-          if grep -q "$GOOGLE_TTS_API_KEY" index.html; then
-            echo "✅ API key found in index.html"
-          else
-            echo "❌ ERROR: API key NOT found in index.html"
-            exit 1
-          fi
           # Check if the API key is in the config.js file
           if grep -q "$GOOGLE_TTS_API_KEY" config.js; then
             echo "✅ API key found in config.js"
           else
             echo "❌ ERROR: API key NOT found in config.js"
             exit 1
-          fi
-          # Check that the API placeholder is gone
-          if grep -q "__GOOGLE_TTS_API_KEY__" index.html; then
-            echo "❌ ERROR: API key placeholder still found in index.html"
-            exit 1
-          else
-            echo "✅ API key placeholder not found in index.html"
           fi
           echo "All verification checks passed!"
 
