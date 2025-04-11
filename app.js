@@ -1,5 +1,5 @@
-// Initialize Google TTS (constructor only)
-const googleTTS = new GoogleTTSManager();
+// Declare googleTTS; will be initialized after DOM load
+let googleTTS;
 
 // API key is set in index.html
 
@@ -18,6 +18,9 @@ let isTransitioning = false;
 
 // Initialize the app
 function init() {
+    // Instantiate the TTS Manager now that the config should be loaded
+    googleTTS = new GoogleTTSManager();
+
     // Set up event listeners
     nextButton.addEventListener('click', () => {
         if (!isTransitioning) {
