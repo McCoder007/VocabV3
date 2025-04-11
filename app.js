@@ -15,11 +15,16 @@ const nextButton = document.getElementById('next-button');
 // State
 let currentWordIndex = 0;
 let countdownTimeout;
+let isTransitioning = false;
 
 // Initialize the app
 function init() {
     // Set up event listeners
-    nextButton.addEventListener('click', showNextWord);
+    nextButton.addEventListener('click', () => {
+        if (!isTransitioning) {
+            showNextWord();
+        }
+    });
     
     // Show first word
     showNextWord();
@@ -27,29 +32,50 @@ function init() {
 
 // Show the next vocabulary word
 function showNextWord() {
+    // Prevent rapid clicking
+    if (isTransitioning) return;
+    isTransitioning = true;
+    
     // Reset state
     clearTimeout(countdownTimeout);
+    
+    // Reset translations
     translations.classList.add('hidden');
-    countdownProgress.style.transform = 'scaleX(1)';
+    englishWord.textContent = '';
+    chineseWord.textContent = '';
     
-    // Get current word
-    const currentWord = vocabularyData[currentWordIndex];
-    
-    // Update image
-    vocabImage.src = currentWord.image;
-    
-    // Start countdown
-    startCountdown();
-    
-    // Move to next word index
-    currentWordIndex = (currentWordIndex + 1) % vocabularyData.length;
+    // Reset progress bar with a small delay to ensure proper transition
+    setTimeout(() => {
+        countdownProgress.style.transition = 'none';
+        countdownProgress.style.transform = 'scaleX(1)';
+        
+        // Force reflow to ensure the transition is reset
+        void countdownProgress.offsetWidth;
+        
+        // Restore transition
+        countdownProgress.style.transition = 'transform 3s linear';
+        
+        // Get current word
+        const currentWord = vocabularyData[currentWordIndex];
+        
+        // Update image
+        vocabImage.src = currentWord.image;
+        
+        // Start countdown
+        startCountdown();
+        
+        // Move to next word index
+        currentWordIndex = (currentWordIndex + 1) % vocabularyData.length;
+        
+        // Allow transitions again after a short delay
+        setTimeout(() => {
+            isTransitioning = false;
+        }, 300);
+    }, 10);
 }
 
 // Start the countdown timer
 function startCountdown() {
-    // Reset progress bar
-    countdownProgress.style.transform = 'scaleX(1)';
-    
     // Start countdown animation
     countdownProgress.style.transform = 'scaleX(0)';
     
