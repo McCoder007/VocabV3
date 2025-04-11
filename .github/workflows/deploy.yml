@@ -26,10 +26,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
-        env:
-          GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
-        run: node build.js
+      - name: Check for API key
+        run: |
+          if [ -z "${{ secrets.GOOGLE_TTS_API_KEY }}" ]; then
+            echo "ERROR: GOOGLE_TTS_API_KEY secret is not set in repository settings"
+            exit 1
+          else
+            echo "API key is set and available"
+          fi
+
+      - name: Create config file with API key directly
+        run: |
+          echo "// Configuration for the vocabulary learning app" > config.js
+          echo "const config = {" >> config.js
+          echo "    googleTTSApiKey: '${{ secrets.GOOGLE_TTS_API_KEY }}'" >> config.js
+          echo "};" >> config.js
+          cat config.js
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
