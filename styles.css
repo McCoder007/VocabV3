@@ -18,6 +18,8 @@ body {
     max-width: 500px;
     padding: 20px;
     display: flex;
+    background-color: #fff;
+    border-radius: 20px;
 }
 
 .vocabulary-card {
