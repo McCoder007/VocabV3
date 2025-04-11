@@ -17,6 +17,7 @@ body {
     width: 100%;
     max-width: 500px;
     padding: 20px;
+    display: flex;
 }
 
 .vocabulary-card {
@@ -137,4 +138,47 @@ body {
     .chinese-word {
         font-size: 18px;
     }
+}
+
+/* Add styles for the start screen */
+.start-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.start-screen h1 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.start-screen p {
+    margin-bottom: 25px;
+    color: #666;
+}
+
+.start-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    background-color: #5cb85c; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.start-button:hover {
+    background-color: #4cae4c;
+}
+
+/* Utility class to hide elements */
+.hidden {
+    display: none !important;
 } 
