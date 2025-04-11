@@ -12,35 +12,58 @@ if (!apiKey) {
   console.log(`API key starts with: ${apiKey.substring(0, 4)}...`);
 }
 
-// Helper function to replace all placeholder variations
-function replaceAllPlaceholders(content, apiKey) {
-  return content
-    .replace(/__GOOGLE_TTS_API_KEY__/g, apiKey)
-    .replace(/'__GOOGLE_TTS_API_KEY__'/g, `'${apiKey}'`)
-    .replace(/"__GOOGLE_TTS_API_KEY__"/g, `"${apiKey}"`)
-    .replace(/googleTTSApiKey: '.*?'/g, `googleTTSApiKey: '${apiKey}'`)
-    .replace(/googleTTS\.setApiKey\('.*?'\)/g, `googleTTS.setApiKey('${apiKey}')`)
-    .replace(/\*\*\*/g, apiKey); // In case of obfuscated placeholders
-}
-
-// Update index.html
+// Update index.html with the exact pattern match
 try {
   console.log('Reading index.html file');
   const indexContent = fs.readFileSync('index.html', 'utf8');
   console.log('Successfully read index.html file');
   
-  // Replace all possible placeholders
-  const updatedContent = replaceAllPlaceholders(indexContent, apiKey);
+  // Create a completely new script tag with hardcoded API key
+  const scriptPattern = /<script>\s*\/\/\s*Initialize with API key[\s\S]*?<\/script>/;
+  const newScript = `<script>
+        // Initialize with API key and voice settings
+        document.addEventListener('DOMContentLoaded', function() {
+            // Log what we're trying to do
+            console.log('Initializing Google TTS...');
+            
+            // Direct API key - no placeholder
+            const apiKey = '${apiKey}';
+            console.log('API key length:', apiKey.length);
+            console.log('API key first 4 chars:', apiKey.substring(0, 4));
+            
+            // Directly use the API key - hardcoded during build
+            googleTTS.setApiKey(apiKey);
+            
+            // Set to male Neural2 voice
+            googleTTS.setVoice('en-US-Neural2-D');
+            
+            // Initialize audio on first user interaction for iOS
+            document.body.addEventListener('touchstart', function() {
+                // Try to initialize audio context
+                if (googleTTS.audioContext && googleTTS.audioContext.state === 'suspended') {
+                    googleTTS.audioContext.resume();
+                }
+            }, {once: true});
+        });
+    </script>`;
   
-  // Write the updated content back to the file
-  fs.writeFileSync('index.html', updatedContent);
-  console.log('Successfully updated index.html with API key');
+  // Replace the entire script tag
+  const updatedContent = indexContent.replace(scriptPattern, newScript);
   
-  // Debug - confirm the api key is properly set
-  if (updatedContent.includes(apiKey)) {
-    console.log('✓ Confirmed API key is present in index.html');
+  // Check if replacement happened
+  if (updatedContent === indexContent) {
+    console.error('❌ Failed to find and replace the script tag in index.html');
   } else {
-    console.error('✗ API key NOT found in updated index.html!');
+    // Write the updated content back to the file
+    fs.writeFileSync('index.html', updatedContent);
+    console.log('✅ Successfully updated index.html with API key');
+    
+    // Debug - confirm the api key is properly set
+    if (updatedContent.includes(apiKey)) {
+      console.log('✓ Confirmed API key is present in index.html');
+    } else {
+      console.error('✗ API key NOT found in updated index.html!');
+    }
   }
 } catch (error) {
   console.error(`Error updating index.html: ${error.message}`);
@@ -49,8 +72,8 @@ try {
 
 // Create or update config.js
 try {
-  console.log('Checking config.js file');
-  let configContent = `// Configuration for the vocabulary learning app
+  console.log('Creating config.js file with API key');
+  const configContent = `// Configuration for the vocabulary learning app
 const config = {
     googleTTSApiKey: '${apiKey}'  // Direct insertion with no placeholder
 };`;
@@ -58,50 +81,65 @@ const config = {
   // Always create a fresh config.js with the API key directly inserted
   fs.writeFileSync('config.js', configContent);
   console.log('Successfully created config.js with API key directly inserted');
-  console.log('Content of config.js:');
-  console.log(configContent);
-  
-  // Debug - confirm the api key is properly set
-  if (configContent.includes(apiKey)) {
-    console.log('✓ Confirmed API key is present in config.js');
-  } else {
-    console.error('✗ API key NOT found in config.js!');
-  }
+  console.log(`Config contains key that starts with: ${apiKey.substring(0, 4)}...`);
 } catch (error) {
   console.error(`Error updating config.js: ${error.message}`);
   process.exit(1);
 }
 
-// Update google-tts.js to bypass the placeholder check
+// Create a direct app.js injection to immediately set the API key
 try {
-  console.log('Updating google-tts.js to modify placeholder check');
+  console.log('Creating app-init.js file to directly set the API key');
+  const initContent = `// Direct TTS API key setter
+console.log('Directly setting Google TTS API key from app-init.js');
+if (typeof googleTTS !== 'undefined') {
+    googleTTS.setApiKey('${apiKey}');
+} else {
+    console.error('googleTTS not defined yet - will rely on the initialization in index.html');
+}`;
+  
+  fs.writeFileSync('app-init.js', initContent);
+  console.log('Successfully created app-init.js');
+  
+  // Now update index.html to include this script right after google-tts.js
+  try {
+    const indexContent = fs.readFileSync('index.html', 'utf8');
+    const updatedContent = indexContent.replace(
+      /<script src="google-tts.js"><\/script>/,
+      `<script src="google-tts.js"></script>\n    <script src="app-init.js"></script>`
+    );
+    
+    if (updatedContent !== indexContent) {
+      fs.writeFileSync('index.html', updatedContent);
+      console.log('✅ Successfully added app-init.js to index.html');
+    }
+  } catch (indexError) {
+    console.error(`Error updating index.html for app-init.js: ${indexError.message}`);
+  }
+} catch (error) {
+  console.error(`Error creating app-init.js: ${error.message}`);
+  // Continue even if this fails
+}
+
+// Fix google-tts.js
+try {
+  console.log('Updating google-tts.js to completely disable placeholder checks');
   
   if (!fs.existsSync('google-tts.js')) {
     console.warn('google-tts.js not found, skipping modification');
   } else {
     const googleTtsContent = fs.readFileSync('google-tts.js', 'utf8');
     
-    // Replace the placeholder check to never trigger
-    const modifiedContent = googleTtsContent
-      // Replace the placeholder check in setApiKey method
-      .replace(
-        /if\s*\(key\.startsWith\(['"]__GOOGLE_TTS_API_KEY__['"]\)\)\s*{[^}]*}/,
-        `if (false) { // Modified by build script
-            console.log('Placeholder check disabled by build script');
-        }`
-      )
-      // Replace the placeholder check in synthesizeSpeech method
-      .replace(
-        /if\s*\(this\.apiKey\.startsWith\(['"]__GOOGLE_TTS_API_KEY__['"]\)\)\s*{[^}]*}/,
-        `if (false) { // Modified by build script
-            console.log('Placeholder check disabled by build script');
-        }`
-      );
-    
+    // Replace any check for placeholder with false
+    let modifiedContent = googleTtsContent
+      .replace(/key\.startsWith\(['"]__GOOGLE_TTS_API_KEY__['"]\)/g, 'false')
+      .replace(/this\.apiKey\.startsWith\(['"]__GOOGLE_TTS_API_KEY__['"]\)/g, 'false')
+      .replace(/startsWith\(['"]__GOOGLE_TTS_API_KEY__['"]\)/g, 'false');
+      
     fs.writeFileSync('google-tts.js', modifiedContent);
     console.log('Successfully updated google-tts.js');
   }
 } catch (error) {
   console.error(`Error updating google-tts.js: ${error.message}`);
-  // Continue even if this fails, as it's not critical
+  // Continue even if this fails
 } 

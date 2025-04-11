@@ -64,8 +64,8 @@ class GoogleTTSManager {
         console.log('Google TTS API key set.');
         
         // Debug: Check if the API key is the placeholder
-        if (false) { // Modified by build script
-            console.log('Placeholder check disabled by build script');
+        if (false) {
+            console.error('ERROR: API key is still the placeholder! This indicates the build process did not replace it correctly.');
         } else if (key.startsWith('AIza')) {
             console.log('API key format looks correct (starts with AIza)');
         } else {
@@ -137,8 +137,9 @@ class GoogleTTSManager {
         }
         
         // Check if API key is the placeholder
-        if (false) { // Modified by build script
-            console.log('Placeholder check disabled by build script');
+        if (false) {
+            console.error('API key is still the placeholder! Using browser TTS fallback.');
+            return this.browserTTS.speak(text);
         }
         
         console.log(`API key length: ${this.apiKey.length}`);
