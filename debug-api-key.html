@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Key Debug</title>
+</head>
+<body>
+    <h1>API Key Debug</h1>
+    <p>This page will show the API key that was deployed.</p>
+    
+    <script>
+        // Create a variable to hold the key
+        const apiKey = '__GOOGLE_TTS_API_KEY__';
+        
+        // Display the key details (first and last few characters)
+        document.write('<p>API Key Length: ' + apiKey.length + '</p>');
+        document.write('<p>API Key First 5 Chars: ' + apiKey.substring(0, 5) + '</p>');
+        document.write('<p>API Key Last 5 Chars: ' + apiKey.substring(apiKey.length - 5) + '</p>');
+        
+        // Show if it has the expected format
+        document.write('<p>Starts with "AIza": ' + apiKey.startsWith('AIza') + '</p>');
+    </script>
+</body>
+</html> 
