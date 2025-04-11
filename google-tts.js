@@ -2,12 +2,12 @@
 class GoogleTTSManager {
     constructor() {
         // Get API key directly from the global config object
-        console.log('TTS Constructor: Checking for config object...', typeof config);
+        // console.log('TTS Constructor: Checking for config object...', typeof config);
         if (typeof config !== 'undefined') {
-             console.log('TTS Constructor: config object found. Reading googleTTSApiKey:', config.googleTTSApiKey);
+             // console.log('TTS Constructor: config object found. Reading googleTTSApiKey:', config.googleTTSApiKey);
              this.apiKey = config.googleTTSApiKey;
         } else {
-             console.error('TTS Constructor: config object UNDEFINED!');
+             console.error('TTS Constructor: config object UNDEFINED! API Key will not be set.');
              this.apiKey = '';
         }
         this.voice = 'en-US-Neural2-D'; // Default to male neural voice
@@ -64,14 +64,14 @@ class GoogleTTSManager {
         this.browserTTS.init();
         
         console.log('Google TTS Manager initialized');
-        // Log API key status after attempting to load from config
-        if (!this.apiKey || this.apiKey === '__GOOGLE_TTS_API_KEY__') {
-             console.error('ERROR: Google TTS API key not found or is still placeholder in config.js!');
-        } else if (this.apiKey.startsWith('AIza')) {
-            console.log('Google TTS API key loaded from config.js successfully.');
-        } else {
-            console.warn('Google TTS API key loaded from config.js, but format is unusual.');
-        }
+        // Log API key status after attempting to load from config - REMOVED/Commented out
+        // if (!this.apiKey || this.apiKey === '__GOOGLE_TTS_API_KEY__') {
+        //      console.error('ERROR: Google TTS API key not found or is still placeholder in config.js!');
+        // } else if (this.apiKey.startsWith('AIza')) {
+        //     console.log('Google TTS API key loaded from config.js successfully.');
+        // } else {
+        //     console.warn('Google TTS API key loaded from config.js, but format is unusual.');
+        // }
     }
     
     // Set voice
@@ -129,10 +129,10 @@ class GoogleTTSManager {
     
     // Call Google Text-to-Speech API using direct Audio approach
     async synthesizeSpeech(text) {
-        console.log(`Attempting Google TTS for text: "${text}"`);
+        // console.log(`Attempting Google TTS for text: "${text}"`);
         
-        // Log the current value of apiKey right before the check
-        console.log(`synthesizeSpeech: Value of this.apiKey before check: '${this.apiKey}' (length: ${this.apiKey ? this.apiKey.length : 0})`);
+        // Log the current value of apiKey right before the check - REMOVED/Commented out
+        // console.log(`synthesizeSpeech: Value of this.apiKey before check: '${this.apiKey}' (length: ${this.apiKey ? this.apiKey.length : 0})`);
         
         // Check if API key is set and valid
         if (!this.apiKey || this.apiKey === '__GOOGLE_TTS_API_KEY__') {
