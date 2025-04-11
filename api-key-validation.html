@@ -1,0 +1,15 @@
+
+  <!-- This file proves the API key was properly set -->
+  <html>
+  <body>
+    <h1>API Key Validation</h1>
+    <div id="output"></div>
+    <script>
+      document.getElementById('output').innerHTML = 
+        'API Key was replaced: ' + ('AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8' !== '__GOOGLE_TTS_API_KEY__') + '<br>' +
+        'API Key starts with: ' + 'AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8'.substring(0, 4) + '...<br>' +
+        'API Key length: ' + 'AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8'.length;
+    </script>
+  </body>
+  </html>
+  

@@ -8,8 +8,8 @@
     <p>This page will show the API key that was deployed.</p>
     
     <script>
-        // Create a variable to hold the key
-        const apiKey = 'AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8';
+        // Create a variable to hold the key - THIS WILL BE REPLACED
+        const apiKey = "AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8";
         
         // Display the key details (first and last few characters)
         document.write('<p>API Key Length: ' + apiKey.length + '</p>');
@@ -18,6 +18,11 @@
         
         // Show if it has the expected format
         document.write('<p>Starts with "AIza": ' + apiKey.startsWith('AIza') + '</p>');
+        
+        // Direct console logs for debugging
+        console.log("API Key:", apiKey);
+        console.log("API Key Length:", apiKey.length);
+        console.log("API Key First 5 Chars:", apiKey.substring(0, 5));
     </script>
 </body>
 </html> 
