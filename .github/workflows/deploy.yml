@@ -35,15 +35,7 @@ jobs:
             echo "API key is set and available"
           fi
 
-      - name: Create config file with API key directly
-        run: |
-          echo "// Configuration for the vocabulary learning app" > config.js
-          echo "const config = {" >> config.js
-          echo "    googleTTSApiKey: '${{ secrets.GOOGLE_TTS_API_KEY }}'" >> config.js
-          echo "};" >> config.js
-          cat config.js
-
-      - name: Ensure API key is used in index.html
+      - name: Update API keys in all files
         env:
           GOOGLE_TTS_API_KEY: ${{ secrets.GOOGLE_TTS_API_KEY }}
         run: |
