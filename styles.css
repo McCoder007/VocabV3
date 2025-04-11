@@ -49,12 +49,12 @@ body {
 .translations-container {
     position: relative;
     width: 100%;
-    min-height: 120px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding-top: 15px;
+    justify-content: flex-start;
+    padding-top: 10px;
 }
 
 .countdown-bar {
@@ -62,8 +62,10 @@ body {
     height: 4px;
     background-color: #e0e0e0;
     border-radius: 2px;
-    margin-bottom: 20px;
     overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .countdown-progress {
@@ -72,6 +74,13 @@ body {
     background-color: #3498db;
     transform-origin: left;
     transition: transform 3s linear;
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    margin-top: 14px;
 }
 
 .translations {
@@ -88,7 +97,7 @@ body {
 }
 
 .english-word {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #333;
