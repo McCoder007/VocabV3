@@ -31,5 +31,24 @@
     <script src="google-tts.js"></script>
     <script src="vocabulary-data.js"></script>
     <script src="app.js"></script>
+    
+    <script>
+        // Initialize with API key and voice settings
+        document.addEventListener('DOMContentLoaded', function() {
+            // API key (will be replaced during build)
+            googleTTS.setApiKey('__GOOGLE_TTS_API_KEY__');
+            
+            // Set to male Neural2 voice
+            googleTTS.setVoice('en-US-Neural2-D');
+            
+            // Initialize audio on first user interaction for iOS
+            document.body.addEventListener('touchstart', function() {
+                // Try to initialize audio context
+                if (googleTTS.audioContext && googleTTS.audioContext.state === 'suspended') {
+                    googleTTS.audioContext.resume();
+                }
+            }, {once: true});
+        });
+    </script>
 </body>
 </html> 
