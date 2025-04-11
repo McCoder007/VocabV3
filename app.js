@@ -19,6 +19,16 @@ let currentWordIndex = 0;
 let countdownTimeout;
 let isTransitioning = false;
 
+// Function to preload images
+function preloadImages() {
+    console.log('Preloading images...');
+    vocabularyData.forEach(item => {
+        const img = new Image();
+        img.src = item.image;
+    });
+    console.log('Image preloading initiated.');
+}
+
 function setupStartScreen() {
     // Ensure vocab card is hidden and start screen is shown initially
     vocabularyCard.classList.add('hidden');
@@ -36,6 +46,9 @@ function setupStartScreen() {
 function initAppLogic() {
     // Instantiate the TTS Manager now that the config should be loaded and user interacted
     googleTTS = new GoogleTTSManager();
+
+    // Start preloading images in the background
+    preloadImages();
 
     // Set up event listeners
     nextButton.addEventListener('click', () => {
