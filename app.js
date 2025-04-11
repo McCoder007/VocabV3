@@ -1,8 +1,7 @@
-// Initialize Google TTS (This is now handled in index.html)
+// Initialize Google TTS (constructor only)
 const googleTTS = new GoogleTTSManager();
 
-// This line is now handled in index.html initialization
-// googleTTS.setApiKey(config.googleTTSApiKey);
+// API key is set in index.html
 
 // DOM Elements
 const vocabImage = document.getElementById('vocab-image');

@@ -36,17 +36,9 @@
     <script>
         // Initialize with API key and voice settings
         document.addEventListener('DOMContentLoaded', function() {
-            // Log what we're trying to do
-            console.log('Initializing Google TTS...');
-            
-            // Direct API key - no placeholder
-            const apiKey = 'AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8
-';
-            console.log('API key length:', apiKey.length);
-            console.log('API key first 4 chars:', apiKey.substring(0, 4));
-            
-            // Directly use the API key - hardcoded during build
-            googleTTS.setApiKey(apiKey);
+            // API key is directly set here and replaced during build
+            googleTTS.setApiKey('AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8
+');
             
             // Set to male Neural2 voice
             googleTTS.setVoice('en-US-Neural2-D');
