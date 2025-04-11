@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Learning App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="vocabulary-card">
+            <div class="image-container">
+                <img id="vocab-image" src="" alt="Vocabulary image">
+            </div>
+            <div class="translations-container">
+                <div id="countdown-bar" class="countdown-bar">
+                    <div class="countdown-progress"></div>
+                </div>
+                <div class="translations hidden" id="translations">
+                    <div class="english-word" id="english-word"></div>
+                    <div class="chinese-word" id="chinese-word"></div>
+                </div>
+            </div>
+            <button id="next-button" class="next-button">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="google-tts.js"></script>
+    <script src="vocabulary-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
