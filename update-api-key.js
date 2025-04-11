@@ -1,4 +1,4 @@
-// Script to safely update the API key in index.html and config.js
+// Script to update API keys in files
 const fs = require('fs');
 
 // Get API key from environment variable
@@ -12,65 +12,33 @@ if (!apiKey) {
   console.log(`API key starts with: ${apiKey.substring(0, 4)}...`);
 }
 
-// Update index.html with the exact pattern match
+// Update index.html - directly replace the API key
 try {
   console.log('Reading index.html file');
   const indexContent = fs.readFileSync('index.html', 'utf8');
   console.log('Successfully read index.html file');
   
-  // Create a completely new script tag with hardcoded API key
-  const scriptPattern = /<script>\s*\/\/\s*Initialize with API key[\s\S]*?<\/script>/;
-  const newScript = `<script>
-        // Initialize with API key and voice settings
-        document.addEventListener('DOMContentLoaded', function() {
-            // Log what we're trying to do
-            console.log('Initializing Google TTS...');
-            
-            // Direct API key - no placeholder
-            const apiKey = '${apiKey}';
-            console.log('API key length:', apiKey.length);
-            console.log('API key first 4 chars:', apiKey.substring(0, 4));
-            
-            // Directly use the API key - hardcoded during build
-            googleTTS.setApiKey(apiKey);
-            
-            // Set to male Neural2 voice
-            googleTTS.setVoice('en-US-Neural2-D');
-            
-            // Initialize audio on first user interaction for iOS
-            document.body.addEventListener('touchstart', function() {
-                // Try to initialize audio context
-                if (googleTTS.audioContext && googleTTS.audioContext.state === 'suspended') {
-                    googleTTS.audioContext.resume();
-                }
-            }, {once: true});
-        });
-    </script>`;
+  // Replace the hard-coded API key with the one from environment variable
+  // Using a regex that matches the specific pattern around the API key
+  const apiKeyRegex = /(googleTTS\.setApiKey\(['"])([^'"]+)(['"])/;
+  const updatedContent = indexContent.replace(apiKeyRegex, `$1${apiKey}$3`);
   
-  // Replace the entire script tag
-  const updatedContent = indexContent.replace(scriptPattern, newScript);
+  // Write the updated content back to the file
+  fs.writeFileSync('index.html', updatedContent);
+  console.log('Successfully updated index.html with API key');
   
-  // Check if replacement happened
-  if (updatedContent === indexContent) {
-    console.error('❌ Failed to find and replace the script tag in index.html');
+  // Debug - confirm the api key is properly set
+  if (updatedContent.includes(apiKey)) {
+    console.log('✓ Confirmed API key is present in index.html');
   } else {
-    // Write the updated content back to the file
-    fs.writeFileSync('index.html', updatedContent);
-    console.log('✅ Successfully updated index.html with API key');
-    
-    // Debug - confirm the api key is properly set
-    if (updatedContent.includes(apiKey)) {
-      console.log('✓ Confirmed API key is present in index.html');
-    } else {
-      console.error('✗ API key NOT found in updated index.html!');
-    }
+    console.error('✗ API key NOT found in updated index.html!');
   }
 } catch (error) {
   console.error(`Error updating index.html: ${error.message}`);
   process.exit(1);
 }
 
-// Create or update config.js
+// Create config.js with the API key
 try {
   console.log('Creating config.js file with API key');
   const configContent = `// Configuration for the vocabulary learning app
@@ -81,7 +49,6 @@ const config = {
   // Always create a fresh config.js with the API key directly inserted
   fs.writeFileSync('config.js', configContent);
   console.log('Successfully created config.js with API key directly inserted');
-  console.log(`Config contains key that starts with: ${apiKey.substring(0, 4)}...`);
 } catch (error) {
   console.error(`Error updating config.js: ${error.message}`);
   process.exit(1);
