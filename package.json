@@ -1,0 +1,24 @@
+{
+  "name": "vocab-learning-app",
+  "version": "1.0.0",
+  "description": "A mobile web application for learning vocabulary with images and text-to-speech",
+  "main": "app.js",
+  "scripts": {
+    "build": "node build.js",
+    "deploy": "node build.js",
+    "serve": "node serve.js"
+  },
+  "keywords": [
+    "vocabulary",
+    "learning",
+    "language",
+    "tts",
+    "text-to-speech"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
+  }
+} 
