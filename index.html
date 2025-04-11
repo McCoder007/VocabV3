@@ -29,35 +29,7 @@
 
     <script src="config.js"></script>
     <script src="google-tts.js"></script>
-    <script src="force-set-api-key.js"></script>
-    <script src="api-key.js"></script>
     <script src="vocabulary-data.js"></script>
     <script src="app.js"></script>
-    
-    <script>
-        // Initialize with API key and voice settings
-        document.addEventListener('DOMContentLoaded', function() {
-            // API key is now loaded from api-key.js
-            if (typeof GOOGLE_TTS_API_KEY !== 'undefined') {
-                googleTTS.setApiKey(GOOGLE_TTS_API_KEY);
-                console.log("Using API key from api-key.js");
-            } else {
-                // Fallback to original method
-                googleTTS.setApiKey('AIzaSyBBe1XfNjodUza5EHDLbs6HTWk8O64b5c8');
-                console.log("Using fallback API key method");
-            }
-            
-            // Set to male Neural2 voice
-            googleTTS.setVoice('en-US-Neural2-D');
-            
-            // Initialize audio on first user interaction for iOS
-            document.body.addEventListener('touchstart', function() {
-                // Try to initialize audio context
-                if (googleTTS.audioContext && googleTTS.audioContext.state === 'suspended') {
-                    googleTTS.audioContext.resume();
-                }
-            }, {once: true});
-        });
-    </script>
 </body>
 </html> 

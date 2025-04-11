@@ -51,24 +51,24 @@ console.log('API key loaded from separate file: ' + GOOGLE_TTS_API_KEY.substring
   console.error(`Error creating api-key.js: ${error.message}`);
 }
 
-// Update index.html - manually replace the placeholder
-try {
-  console.log('Reading index.html file');
-  let content = fs.readFileSync('index.html', 'utf8');
-  console.log('Original index.html has placeholder:', content.includes('__GOOGLE_TTS_API_KEY__'));
-  
-  // Replace the placeholder - using manual string replace to avoid regex issues
-  content = replaceAll(content, '__GOOGLE_TTS_API_KEY__', apiKey);
-  console.log('After replacement, still has placeholder:', content.includes('__GOOGLE_TTS_API_KEY__'));
-  console.log('After replacement, has API key:', content.includes(apiKey));
-  
-  // Write the updated content back to the file
-  fs.writeFileSync('index.html', content);
-  console.log('Successfully updated index.html with API key');
-} catch (error) {
-  console.error(`Error updating index.html: ${error.message}`);
-  process.exit(1);
-}
+// // Update index.html - REMOVED as key is sourced from config.js now
+// try {
+//   console.log('Reading index.html file');
+//   let content = fs.readFileSync('index.html', 'utf8');
+//   console.log('Original index.html has placeholder:', content.includes('__GOOGLE_TTS_API_KEY__'));
+//   
+//   // Replace the placeholder - using manual string replace to avoid regex issues
+//   content = replaceAll(content, '__GOOGLE_TTS_API_KEY__', apiKey);
+//   console.log('After replacement, still has placeholder:', content.includes('__GOOGLE_TTS_API_KEY__'));
+//   console.log('After replacement, has API key:', content.includes(apiKey));
+//   
+//   // Write the updated content back to the file
+//   fs.writeFileSync('index.html', content);
+//   console.log('Successfully updated index.html with API key');
+// } catch (error) {
+//   console.error(`Error updating index.html: ${error.message}`);
+//   process.exit(1);
+// }
 
 // Create config.js - create directly with the API key
 try {
