@@ -128,7 +128,7 @@ function showNextWord() {
     countdownProgress.style.transform = 'scaleX(1)';
     // Force reflow might still be useful here to ensure reset applies before transition starts
     void countdownProgress.offsetWidth;
-    countdownProgress.style.transition = 'transform 3s linear';
+    countdownProgress.style.transition = 'transform 3.6s linear';
 
     // Start countdown (which also handles the animation start)
     startCountdown();
@@ -147,10 +147,10 @@ function startCountdown() {
     // Start countdown animation
     countdownProgress.style.transform = 'scaleX(0)';
     
-    // Show translations after 3 seconds
+    // Show translations after 3.6 seconds
     countdownTimeout = setTimeout(() => {
         showTranslations();
-    }, 3000);
+    }, 3600);
 }
 
 // Show translations and play audio
