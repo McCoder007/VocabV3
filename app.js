@@ -18,6 +18,33 @@ const vocabularyCard = document.getElementById('vocabulary-card');
 let currentWordIndex = 0;
 let countdownTimeout;
 let isTransitioning = false;
+let audioElements = []; // Array to store preloaded audio elements
+
+// Function to preload audio files
+function preloadAudioFiles() {
+    console.log('Preloading audio files...');
+    // Create audio elements for each audio file
+    for (let i = 1; i <= 10; i++) {
+        const audio = new Audio(`audio/w${i}.mp3`);
+        audio.load(); // Preload the audio
+        audioElements.push(audio);
+    }
+    console.log('Audio preloading initiated.');
+}
+
+// Function to play audio for the current word
+function playWordAudio(index) {
+    // First word always plays w1.mp3
+    if (index === 0) {
+        audioElements[0].currentTime = 0; // Reset to beginning
+        audioElements[0].play();
+    } else {
+        // For other words, randomly select from w2-w10
+        const randomIndex = 1 + Math.floor(Math.random() * 9); // Random index 1-9 (w2-w10)
+        audioElements[randomIndex].currentTime = 0; // Reset to beginning
+        audioElements[randomIndex].play();
+    }
+}
 
 // Function to preload images
 function preloadImages() {
@@ -49,6 +76,9 @@ function initAppLogic() {
 
     // Start preloading images in the background
     preloadImages();
+    
+    // Preload audio files
+    preloadAudioFiles();
 
     // Set up event listeners
     nextButton.addEventListener('click', () => {
@@ -81,6 +111,9 @@ function showNextWord() {
 
     // Update image IMMEDIATELY
     vocabImage.src = wordToShow.image;
+    
+    // Play audio for the current word
+    playWordAudio(currentWordIndex);
 
     // Reset progress bar animation
     countdownProgress.style.transition = 'none';
