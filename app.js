@@ -19,12 +19,13 @@ let currentWordIndex = 0;
 let countdownTimeout;
 let isTransitioning = false;
 let audioElements = []; // Array to store preloaded audio elements
+let lastPlayedAudioIndex = -1; // Keep track of the last played audio index
 
 // Function to preload audio files
 function preloadAudioFiles() {
     console.log('Preloading audio files...');
-    // Create audio elements for each audio file
-    for (let i = 1; i <= 10; i++) {
+    // Create audio elements for each audio file (w1-w9)
+    for (let i = 1; i <= 9; i++) {
         const audio = new Audio(`audio/w${i}.mp3`);
         audio.load(); // Preload the audio
         audioElements.push(audio);
@@ -38,11 +39,18 @@ function playWordAudio(index) {
     if (index === 0) {
         audioElements[0].currentTime = 0; // Reset to beginning
         audioElements[0].play();
+        lastPlayedAudioIndex = 0;
     } else {
-        // For other words, randomly select from w2-w10
-        const randomIndex = 1 + Math.floor(Math.random() * 9); // Random index 1-9 (w2-w10)
+        // For other words, randomly select from w2-w9
+        // But avoid the last played audio
+        let randomIndex;
+        do {
+            randomIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
+        } while (randomIndex === lastPlayedAudioIndex);
+        
         audioElements[randomIndex].currentTime = 0; // Reset to beginning
         audioElements[randomIndex].play();
+        lastPlayedAudioIndex = randomIndex;
     }
 }
 
