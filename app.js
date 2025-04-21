@@ -41,6 +41,7 @@ let countdownTimeout;
 let isTransitioning = false;
 let audioElements = []; // Array to store preloaded audio elements
 let lastPlayedAudioIndex = -1; // Keep track of the last played audio index
+let translationsContainerMinHeight = ''; // Cache for dynamic min-height
 
 // Function to update the progress bar and label
 function updateProgressBar() {
@@ -136,10 +137,11 @@ function switchView(viewToShow) { // viewToShow is the element to show
     learningListView.classList.add('hidden');
     knownListView.classList.add('hidden');
 
-    // Pause flashcard timer if switching away from it
+    // Pause flashcard timer and reset dynamic height if switching away
     if (viewToShow !== vocabularyCard) {
         clearTimeout(countdownTimeout);
-        console.log('Paused flashcard timer.');
+        translationsContainer.style.minHeight = ''; // Reset dynamic height
+        console.log('Paused flashcard timer & reset dynamic minHeight.');
     }
 
     // Show the target view
@@ -245,9 +247,14 @@ function resetAllProgress() {
     knownListView.classList.add('hidden'); // Hide known list
     startScreen.style.display = 'flex'; // Show start screen
 
-    // Clear any active timers from the previous card session
+    // Clear any active timers
     clearTimeout(countdownTimeout);
-    isTransitioning = false; // Reset transition state
+    isTransitioning = false; 
+
+    // Reset dynamic height state
+    translationsContainer.style.minHeight = ''; 
+    translationsContainerMinHeight = ''; 
+    console.log('Reset dynamic minHeight on reset.');
 
     console.log('All progress has been reset! Click Start Learning to begin.'); 
 }
@@ -275,6 +282,12 @@ function initAppLogic() {
 function showSpecificWord(index) {
     if (isTransitioning) return; // Should not happen on init, but safety first
     isTransitioning = true;
+
+    // Apply cached min-height BEFORE hiding elements
+    if (translationsContainerMinHeight) {
+        translationsContainer.style.minHeight = translationsContainerMinHeight;
+        // console.log('Applied minHeight:', translationsContainerMinHeight);
+    }
 
     // Reset state
     clearTimeout(countdownTimeout);
@@ -345,6 +358,13 @@ function showNextWord() {
     if (isTransitioning) return;
     isTransitioning = true;
 
+    // Apply cached min-height BEFORE hiding elements
+    if (translationsContainerMinHeight) {
+        translationsContainer.style.minHeight = translationsContainerMinHeight;
+        // console.log('Applied minHeight:', translationsContainerMinHeight);
+    }
+
+    // Hide elements
     clearTimeout(countdownTimeout);
     translations.classList.add('hidden');
     actionButtons.classList.add('hidden');
@@ -396,9 +416,7 @@ function startCountdown() {
 
 // Show translations and play audio
 function showTranslations() {
-    // Use the currentWordIndex directly
     const currentWord = vocabularyData[currentWordIndex]; 
-    
     if (!currentWord) {
         console.error("Error: Could not find word data for index", currentWordIndex);
         return;
@@ -407,10 +425,23 @@ function showTranslations() {
     englishWord.textContent = currentWord.english;
     chineseWord.textContent = currentWord.chinese;
     
+    // Reveal elements
     translations.classList.remove('hidden');
     actionButtons.classList.remove('hidden');
     
+    // Play audio
     googleTTS.speak(currentWord.english);
+
+    // Measure and cache the height AFTER revealing and rendering
+    setTimeout(() => {
+        const height = translationsContainer.offsetHeight;
+        // Set a reasonable lower bound to avoid caching tiny heights during transitions
+        if (height > 50) { 
+            translationsContainerMinHeight = height + 'px';
+            translationsContainer.style.minHeight = translationsContainerMinHeight; // Apply immediately too
+            // console.log('Measured and cached minHeight:', translationsContainerMinHeight);
+        }
+    }, 10); // Small delay for render - adjust if needed
 }
 
 // Initialize the start screen setup and add tab listeners when the page loads
