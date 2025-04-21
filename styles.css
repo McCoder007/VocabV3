@@ -81,8 +81,8 @@ body {
     justify-content: center; /* Center content vertically */
     padding: 10px 0 5px 0; 
     flex-shrink: 0; 
-    flex-grow: 1; /* Allow this container to take vertical space */
-    /* border: 1px solid red; */ /* Debug */
+    flex-grow: 1; 
+    /* min-height: ?px; */ /* Removed - JS will handle */
 }
 
 .countdown-bar {
@@ -115,7 +115,7 @@ body {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
-    min-height: 90px; /* Increased min-height slightly */
+    /* min-height: 90px; */ /* Removed */
     /* border: 1px dashed blue; */ /* Debug */
 }
 
@@ -148,8 +148,8 @@ body {
     visibility: visible;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
     margin-top: 10px; 
-    min-height: 50px; /* Increased min-height slightly */
-    flex-shrink: 0; /* Prevent buttons shrinking */
+    min-height: auto; /* Changed from fixed px */
+    flex-shrink: 0; 
     /* border: 1px dashed green; */ /* Debug */
 }
 
