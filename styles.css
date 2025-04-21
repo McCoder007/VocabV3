@@ -56,7 +56,7 @@ body {
     margin-bottom: 10px; 
     border-radius: 10px;
     overflow: hidden;
-    flex-grow: 1; /* Keep this - allows image area to take up slack */
+    flex-grow: 1; /* Ensure image container still takes available space */
     flex-shrink: 1; 
     display: flex; 
     align-items: center;
@@ -72,16 +72,14 @@ body {
 }
 
 .translations-container {
-    position: relative;
+    position: relative; /* Crucial for absolute positioning of children */
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; 
-    padding: 10px 0 5px 0; 
+    height: 200px; /* Fixed Height - Adjust as needed */
+    display: block; /* Changed from flex */
+    padding: 0; /* Remove padding, handle within absolute elements */
     flex-shrink: 0; 
-    /* flex-grow: 1; */ /* Remove this - let it take natural height + min-height */
-    /* min-height: ?px; */ 
+    /* flex-grow: 0; */ /* Ensure it doesn't grow */
+    /* border: 1px solid red; */ /* Debug */
 }
 
 .countdown-bar {
@@ -104,24 +102,28 @@ body {
 }
 
 .translations {
+    position: absolute;
+    top: 10px; /* Position below countdown bar */
+    left: 0;
+    right: 0;
+    height: 130px; /* Approx height for text - Adjust */
     text-align: center;
-    flex-grow: 1; /* Allow this to take up middle space */
-    display: flex;
+    display: flex; /* Use flex to center text vertically within its area */
     flex-direction: column;
-    justify-content: center; /* Center text within its area */
+    justify-content: center;
     width: 100%;
-    padding-top: 10px;
-    opacity: 1;
-    visibility: visible;
+    /* padding-top: 10px; */ /* Removed */
+    opacity: 0; /* Start hidden */
+    visibility: hidden; /* Start hidden */
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
-    /* min-height: 90px; */ /* Removed */
+    /* Removed min-height */
     /* border: 1px dashed blue; */ /* Debug */
 }
 
+/* Keep the override */
 .translations.hidden {
     opacity: 0;
     visibility: hidden;
-    /* display: none !important; NO - Keep it in layout */
 }
 
 .english-word {
@@ -138,24 +140,28 @@ body {
 
 /* Styles for Action Buttons */
 .action-buttons {
+    position: absolute;
+    bottom: 10px; /* Position near bottom */
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-around;
     width: 100%;
-    padding: 0 10px;
+    padding: 0 15px; /* Add padding */
     box-sizing: border-box;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
-    margin-top: 10px; 
-    min-height: auto; /* Changed from fixed px */
+    opacity: 0; /* Start hidden */
+    visibility: hidden; /* Start hidden */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
+    /* margin-top: 10px; */ /* Removed */
+    /* Removed min-height */
     flex-shrink: 0; 
     /* border: 1px dashed green; */ /* Debug */
 }
 
+/* Keep the override */
 .action-buttons.hidden {
     opacity: 0;
     visibility: hidden;
-    /* display: none !important; NO - Keep it in layout */
 }
 
 .action-button {
