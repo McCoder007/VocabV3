@@ -9,10 +9,31 @@ const englishWord = document.getElementById('english-word');
 const chineseWord = document.getElementById('chinese-word');
 const translations = document.getElementById('translations');
 const countdownProgress = document.querySelector('.countdown-progress');
-const nextButton = document.getElementById('next-button');
 const startScreen = document.getElementById('start-screen');
 const startButton = document.getElementById('start-button');
 const vocabularyCard = document.getElementById('vocabulary-card');
+const actionButtons = document.getElementById('action-buttons');
+const stillLearningButton = document.getElementById('still-learning-button');
+const gotItButton = document.getElementById('got-it-button');
+const progressBarContainer = document.getElementById('progress-bar-container');
+const progressBar = document.getElementById('progress-bar');
+const progressLabel = document.getElementById('progress-label');
+const resetButton = document.getElementById('reset-button');
+const appTitle = document.querySelector('.app-title');
+const viewContainer = document.getElementById('view-container'); // Added view container
+
+// Tab and List View Elements
+const tabContainer = document.getElementById('tab-container');
+const tabFlashcards = document.getElementById('tab-flashcards');
+const tabLearning = document.getElementById('tab-learning');
+const tabKnown = document.getElementById('tab-known');
+const learningListView = document.getElementById('learning-list-view');
+const knownListView = document.getElementById('known-list-view');
+const learningListUl = document.getElementById('learning-list-ul');
+const knownListUl = document.getElementById('known-list-ul');
+
+// Constants for localStorage
+const LOCAL_STORAGE_KEY = 'vocabProgressV3';
 
 // State
 let currentWordIndex = 0;
@@ -20,6 +41,22 @@ let countdownTimeout;
 let isTransitioning = false;
 let audioElements = []; // Array to store preloaded audio elements
 let lastPlayedAudioIndex = -1; // Keep track of the last played audio index
+
+// Function to update the progress bar and label
+function updateProgressBar() {
+    const totalWords = vocabularyData.length;
+    const knownWords = vocabularyData.filter(word => word.status === 'known').length;
+    const progressPercentage = totalWords > 0 ? Math.round((knownWords / totalWords) * 100) : 0;
+    
+    // Update progress bar width
+    progressBar.style.width = `${progressPercentage}%`;
+    
+    // Update progress label text
+    progressLabel.textContent = `Words Learned: ${progressPercentage}%`;
+
+    // Keep console log for debugging if needed
+    // console.log(`Progress: ${knownWords}/${totalWords} (${progressPercentage}%)`);
+}
 
 // Function to preload audio files
 function preloadAudioFiles() {
@@ -65,81 +102,298 @@ function preloadImages() {
 }
 
 function setupStartScreen() {
-    // Ensure vocab card is hidden and start screen is shown initially
-    // vocabularyCard.classList.add('hidden'); // No longer needed, uses card-hidden
-    // startScreen.classList.remove('hidden'); // Start screen should be visible by default
+    // Ensure initial state: tabs and card hidden, start screen shown
+    tabContainer.classList.add('hidden');
+    vocabularyCard.classList.add('card-hidden');
+    learningListView.classList.add('hidden');
+    knownListView.classList.add('hidden');
+    startScreen.style.display = 'flex'; // Make sure start screen is flex
 
     // Add listener to the start button
     startButton.addEventListener('click', () => {
-        startScreen.style.display = 'none'; // Hide start screen directly
-        vocabularyCard.classList.remove('card-hidden'); // Remove the card-hidden class
-        initAppLogic(); // Call the main app initialization logic
-    }, { once: true }); // Only allow starting once
+        startScreen.style.display = 'none'; // Hide start screen
+        tabContainer.classList.remove('hidden'); // Show tabs
+        vocabularyCard.classList.remove('card-hidden'); // Show flashcard view
+        
+        // Ensure only flashcard tab is active initially
+        setActiveTab(tabFlashcards);
+        
+        // Initialize word logic AFTER showing the card
+        initAppLogic(); 
+
+        // Set the view container min-height based on the flashcard height NOW
+        setTimeout(() => {
+            const cardHeight = vocabularyCard.offsetHeight;
+            if (cardHeight > 0) { // Ensure height is calculated
+                console.log(`Setting view container min-height to: ${cardHeight}px`);
+                viewContainer.style.minHeight = `${cardHeight}px`;
+            } else {
+                console.warn('Could not get vocabularyCard height to set container min-height.');
+            }
+        }, 100); // Small delay for rendering
+    });
+}
+
+// Function to set the active tab button
+function setActiveTab(activeTabButton) {
+    [tabFlashcards, tabLearning, tabKnown].forEach(button => {
+        button.classList.remove('active');
+    });
+    activeTabButton.classList.add('active');
+}
+
+// Function to switch the main view
+function switchView(viewToShow) { // viewToShow is the element to show
+    // Hide all main views
+    vocabularyCard.classList.add('card-hidden'); // Using card-hidden for consistency
+    learningListView.classList.add('hidden');
+    knownListView.classList.add('hidden');
+
+    // Pause flashcard timer if switching away from it
+    if (viewToShow !== vocabularyCard) {
+        clearTimeout(countdownTimeout);
+        console.log('Paused flashcard timer.');
+    }
+
+    // Show the target view
+    if (viewToShow === vocabularyCard) {
+        viewToShow.classList.remove('card-hidden');
+    } else {
+        viewToShow.classList.remove('hidden');
+    }
+    console.log("Switched view to:", viewToShow.id);
+}
+
+// Function to populate the learning list
+function populateLearningList() {
+    const learningWords = vocabularyData.filter(word => word.status === 'learning');
+    learningListUl.innerHTML = ''; // Clear previous list
+    if (learningWords.length === 0) {
+        learningListUl.innerHTML = '<li>No words currently marked as learning.</li>';
+        return;
+    }
+    learningWords.forEach(word => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${word.english}</span><span>${word.chinese}</span>`;
+        learningListUl.appendChild(li);
+    });
+}
+
+// Function to populate the known list
+function populateKnownList() {
+    const knownWords = vocabularyData.filter(word => word.status === 'known');
+    knownListUl.innerHTML = ''; // Clear previous list
+    if (knownWords.length === 0) {
+        knownListUl.innerHTML = '<li>No words marked as known yet.</li>';
+        return;
+    }
+    knownWords.forEach(word => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${word.english}</span><span>${word.chinese}</span>`;
+        knownListUl.appendChild(li);
+    });
+}
+
+// Function to save progress to localStorage
+function saveProgress() {
+    // Store only the status of each word, keyed by English word for robustness
+    const progressToSave = {};
+    vocabularyData.forEach((word, index) => {
+        // Use English word as key, or index as fallback if needed
+        const key = word.english || `word_${index}`; 
+        progressToSave[key] = word.status;
+    });
+    try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progressToSave));
+        console.log('Progress saved to localStorage');
+    } catch (e) {
+        console.error('Failed to save progress to localStorage:', e);
+    }
+}
+
+// Function to load progress from localStorage
+function loadProgress() {
+    try {
+        const savedProgress = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (savedProgress) {
+            const parsedProgress = JSON.parse(savedProgress);
+            console.log('Loading progress from localStorage...');
+            let loadedCount = 0;
+            vocabularyData.forEach((word, index) => {
+                const key = word.english || `word_${index}`;
+                if (parsedProgress[key]) {
+                    word.status = parsedProgress[key];
+                    loadedCount++;
+                }
+                // else: keep default 'new' status
+            });
+            console.log(`Loaded status for ${loadedCount} words.`);
+        } else {
+            console.log('No saved progress found.');
+        }
+    } catch (e) {
+        console.error('Failed to load or parse progress from localStorage:', e);
+        // Optional: Clear corrupted data
+        // localStorage.removeItem(LOCAL_STORAGE_KEY);
+    }
+}
+
+// Function to reset all progress
+function resetAllProgress() {
+    console.log('Resetting all progress...');
+    
+    // 1. Clear localStorage & Reset data
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    vocabularyData.forEach(word => { word.status = 'new'; });
+    currentWordIndex = 0;
+    console.log('Cleared storage and reset statuses.');
+
+    // 2. Update progress bar data (won't be visible yet)
+    updateProgressBar();
+
+    // 3. Reset UI to initial state
+    tabContainer.classList.add('hidden'); // Hide tabs
+    vocabularyCard.classList.add('card-hidden'); // Hide flashcard view
+    learningListView.classList.add('hidden'); // Hide learning list
+    knownListView.classList.add('hidden'); // Hide known list
+    startScreen.style.display = 'flex'; // Show start screen
+
+    // Clear any active timers from the previous card session
+    clearTimeout(countdownTimeout);
+    isTransitioning = false; // Reset transition state
+
+    console.log('All progress has been reset! Click Start Learning to begin.'); 
 }
 
 // Initialize the main app logic (called after start button)
 function initAppLogic() {
-    // Instantiate the TTS Manager now that the config should be loaded and user interacted
+    // Load progress from localStorage first
+    loadProgress();
+
+    // Instantiate the TTS Manager
     googleTTS = new GoogleTTSManager();
 
-    // Start preloading images in the background
+    // Preload assets
     preloadImages();
-    
-    // Preload audio files
     preloadAudioFiles();
 
-    // Set up event listeners
-    nextButton.addEventListener('click', () => {
-        if (!isTransitioning) {
-            showNextWord();
-        }
-    });
-    
-    // Show first word
-    showNextWord();
+    // Initialize progress bar based on potentially loaded state
+    updateProgressBar(); 
+
+    // Show the VERY FIRST word (index 0)
+    showSpecificWord(0);
 }
 
-// Show the next vocabulary word
-function showNextWord() {
-    // Prevent rapid clicking
-    if (isTransitioning) return;
+// Function to show a specific word by index (used for initialization)
+function showSpecificWord(index) {
+    if (isTransitioning) return; // Should not happen on init, but safety first
     isTransitioning = true;
 
     // Reset state
     clearTimeout(countdownTimeout);
-
-    // Reset translations visibility
     translations.classList.add('hidden');
-    // Optionally clear content if needed, but hiding might be enough
-    // englishWord.textContent = '';
-    // chineseWord.textContent = '';
+    actionButtons.classList.add('hidden');
 
-    // Get current word data BEFORE updating the index
+    // Set the current word index
+    currentWordIndex = index;
+
+    // Ensure index is valid
+    if (currentWordIndex < 0 || currentWordIndex >= vocabularyData.length) {
+        console.error("Invalid index provided to showSpecificWord:", index);
+        isTransitioning = false;
+        // Potentially show an error or the start screen?
+        return;
+    }
+
     const wordToShow = vocabularyData[currentWordIndex];
 
-    // Update image IMMEDIATELY
+    // Update UI
     vocabImage.src = wordToShow.image;
-    
-    // Play audio for the current word
-    playWordAudio(currentWordIndex);
+    playWordAudio(currentWordIndex); // Will correctly play w1.mp3 if index is 0
 
-    // Reset progress bar animation
+    // Reset and start countdown animation
     countdownProgress.style.transition = 'none';
     countdownProgress.style.transform = 'scaleX(1)';
-    // Force reflow might still be useful here to ensure reset applies before transition starts
     void countdownProgress.offsetWidth;
     countdownProgress.style.transition = 'transform 3.6s linear';
-
-    // Start countdown (which also handles the animation start)
     startCountdown();
 
-    // Move to next word index for the *next* call
-    currentWordIndex = (currentWordIndex + 1) % vocabularyData.length;
-
-    // Allow transitions again after a short delay (can be adjusted)
+    // Allow transitions again
     setTimeout(() => {
         isTransitioning = false;
-    }, 100); // Reduced delay, adjust as needed
+    }, 100); 
+}
+
+// Function to get the index of the next word based on status
+function getNextWordIndex() {
+    const eligibleIndices = [];
+    vocabularyData.forEach((word, index) => {
+        if (word.status === 'new' || word.status === 'learning') {
+            eligibleIndices.push(index);
+        }
+    });
+
+    if (eligibleIndices.length === 0) {
+        // ALL words are 'known'. Signal completion.
+        console.log("All words marked as 'known'. Session complete.");
+        return -1; // Use -1 to indicate completion
+    }
+
+    // Randomly select an index from the eligible pool
+    let randomIndexInPool = Math.floor(Math.random() * eligibleIndices.length);
+    let nextIndex = eligibleIndices[randomIndexInPool];
+
+    // Avoid showing the same word twice in a row if possible and more than one choice exists
+    if (eligibleIndices.length > 1 && nextIndex === currentWordIndex) {
+        console.log('Avoiding immediate repeat, finding alternative...');
+        randomIndexInPool = (randomIndexInPool + 1) % eligibleIndices.length;
+        nextIndex = eligibleIndices[randomIndexInPool];
+    }
+
+    return nextIndex;
+}
+
+// Show the next vocabulary word (using the selection logic)
+function showNextWord() {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    clearTimeout(countdownTimeout);
+    translations.classList.add('hidden');
+    actionButtons.classList.add('hidden');
+
+    const nextIndex = getNextWordIndex();
+
+    if (nextIndex === -1) {
+        // Handle completion state
+        console.log("Learning Complete! No more words to review.");
+        // Display completion message
+        englishWord.textContent = "Congratulations!";
+        chineseWord.textContent = "All words learned!";
+        translations.classList.remove('hidden'); // Show the message
+        vocabImage.src = ""; // Clear image or show a completion image
+        actionButtons.classList.add('hidden'); // Hide action buttons
+        countdownProgress.style.transform = 'scaleX(0)'; // Hide progress bar
+        isTransitioning = false; // Allow reset etc.
+        return; // Stop here
+    }
+    
+    currentWordIndex = nextIndex; 
+
+    const wordToShow = vocabularyData[currentWordIndex];
+
+    vocabImage.src = wordToShow.image;
+    playWordAudio(currentWordIndex);
+
+    countdownProgress.style.transition = 'none';
+    countdownProgress.style.transform = 'scaleX(1)';
+    void countdownProgress.offsetWidth;
+    countdownProgress.style.transition = 'transform 3.6s linear';
+    startCountdown();
+
+    setTimeout(() => {
+        isTransitioning = false;
+    }, 100); 
 }
 
 // Start the countdown timer
@@ -155,18 +409,80 @@ function startCountdown() {
 
 // Show translations and play audio
 function showTranslations() {
-    const currentWord = vocabularyData[(currentWordIndex - 1 + vocabularyData.length) % vocabularyData.length];
+    // Use the currentWordIndex directly
+    const currentWord = vocabularyData[currentWordIndex]; 
     
-    // Update translations
+    if (!currentWord) {
+        console.error("Error: Could not find word data for index", currentWordIndex);
+        return;
+    }
+
     englishWord.textContent = currentWord.english;
     chineseWord.textContent = currentWord.chinese;
     
-    // Show translations
     translations.classList.remove('hidden');
+    actionButtons.classList.remove('hidden');
     
-    // Play audio
     googleTTS.speak(currentWord.english);
 }
 
-// Initialize the start screen setup when the page loads
-document.addEventListener('DOMContentLoaded', setupStartScreen); 
+// Initialize the start screen setup and add tab listeners when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    setupStartScreen();
+
+    // Add listener for the reset button 
+    const resetButtonElement = document.getElementById('reset-button');
+    if (resetButtonElement) {
+        resetButtonElement.addEventListener('click', resetAllProgress);
+    } else {
+        console.error('Reset button not found!');
+    }
+
+    // --- Add Tab Button Listeners ---
+    tabFlashcards.addEventListener('click', () => {
+        setActiveTab(tabFlashcards);
+        switchView(vocabularyCard);
+        // Refresh the static view of the current card
+        showSpecificWord(currentWordIndex);
+    });
+
+    tabLearning.addEventListener('click', () => {
+        setActiveTab(tabLearning);
+        populateLearningList();
+        switchView(learningListView);
+    });
+
+    tabKnown.addEventListener('click', () => {
+        setActiveTab(tabKnown);
+        populateKnownList();
+        switchView(knownListView);
+    });
+    // --- End Tab Button Listeners ---
+
+    // --- Moved Flashcard Button Listeners Here ---
+    // Ensure these are only active when the flashcard view is visible?
+    // No, state logic handles `isTransitioning` which prevents clicks during view switches.
+    stillLearningButton.addEventListener('click', () => {
+        if (!isTransitioning) {
+            const shownWordIndex = currentWordIndex; 
+            vocabularyData[shownWordIndex].status = 'learning';
+            console.log(`Word "${vocabularyData[shownWordIndex].english}" marked as learning`);
+            updateProgressBar();
+            saveProgress(); 
+            showNextWord(); // This handles getting the next word
+        }
+    });
+
+    gotItButton.addEventListener('click', () => {
+        if (!isTransitioning) {
+            const shownWordIndex = currentWordIndex; 
+            vocabularyData[shownWordIndex].status = 'known';
+            console.log(`Word "${vocabularyData[shownWordIndex].english}" marked as known`);
+            updateProgressBar();
+            saveProgress(); 
+            showNextWord(); // This handles getting the next word
+        }
+    });
+    // --- End Flashcard Button Listeners ---
+
+}); 
