@@ -111,26 +111,13 @@ function setupStartScreen() {
 
     // Add listener to the start button
     startButton.addEventListener('click', () => {
-        startScreen.style.display = 'none'; // Hide start screen
-        tabContainer.classList.remove('hidden'); // Show tabs
-        vocabularyCard.classList.remove('card-hidden'); // Show flashcard view
-        
-        // Ensure only flashcard tab is active initially
+        startScreen.style.display = 'none'; 
+        tabContainer.classList.remove('hidden'); 
+        vocabularyCard.classList.remove('card-hidden'); 
         setActiveTab(tabFlashcards);
         
         // Initialize word logic AFTER showing the card
         initAppLogic(); 
-
-        // Set the view container min-height based on the flashcard height NOW
-        setTimeout(() => {
-            const cardHeight = vocabularyCard.offsetHeight;
-            if (cardHeight > 0) { // Ensure height is calculated
-                console.log(`Setting view container min-height to: ${cardHeight}px`);
-                viewContainer.style.minHeight = `${cardHeight}px`;
-            } else {
-                console.warn('Could not get vocabularyCard height to set container min-height.');
-            }
-        }, 100); // Small delay for rendering
     });
 }
 
