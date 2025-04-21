@@ -113,13 +113,14 @@ body {
     padding-top: 10px;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s linear;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
+    min-height: 80px; /* Reserve minimum space for text */
 }
 
 .translations.hidden {
     opacity: 0;
     visibility: hidden;
-    transition: visibility 0s linear 0.3s, opacity 0.3s linear;
+    /* display: none !important; NO - Keep it in layout */
 }
 
 .english-word {
@@ -143,17 +144,15 @@ body {
     box-sizing: border-box;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s linear;
-    margin-top: 10px; /* Add some space above buttons */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
+    margin-top: 10px; 
+    min-height: 45px; /* Reserve minimum space for buttons */
 }
 
 .action-buttons.hidden {
     opacity: 0;
     visibility: hidden;
-    transition: visibility 0s linear 0.3s, opacity 0.3s linear;
-    /* Ensure it doesn't take up space when hidden */
-    /* If issues persist, uncomment display: none */
-    /* display: none; */ 
+    /* display: none !important; NO - Keep it in layout */
 }
 
 .action-button {
@@ -291,7 +290,7 @@ body {
     transform: scale(0.98); /* Press effect */
 }
 
-/* Utility class to hide elements */
+/* Utility class to hide elements (used for other things like lists/tabs) */
 .hidden {
     display: none !important;
 }
@@ -412,7 +411,7 @@ body {
 /* Ensure hidden views don't affect layout */
 #view-container > .hidden,
 #view-container > .card-hidden {
-    display: none !important; /* Ensure display none is applied */
+    display: none !important; 
     flex-grow: 0; 
     height: 0;
     overflow: hidden;
