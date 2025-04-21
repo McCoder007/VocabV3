@@ -61,70 +61,90 @@ function updateProgressBar() {
 // Function to preload audio files
 function preloadAudioFiles() {
     console.log('Preloading audio files...');
+    // Clear existing audio elements if any
+    audioElements = [];
+    
     // Create audio elements for each audio file (w1-w9)
     for (let i = 1; i <= 9; i++) {
-        const audio = new Audio(`audio/w${i}.mp3`);
+        const audio = new Audio();
+        
+        // Add event listeners to track loading status
+        audio.addEventListener('canplaythrough', () => {
+            console.log(`Audio w${i}.mp3 loaded successfully and can play through`);
+        });
+        
+        audio.addEventListener('error', (e) => {
+            console.error(`Error loading audio w${i}.mp3:`, e);
+        });
+        
+        // Set source and load
+        audio.src = `audio/w${i}.mp3`;
         audio.load(); // Preload the audio
         audioElements.push(audio);
     }
-    console.log('Audio preloading initiated.');
+    console.log('Audio preloading initiated for 9 files.');
 }
 
 // Function to play audio for the current word
 function playWordAudio(index) {
     try {
-        // First word always plays w1.mp3
+        // Find an appropriate audio file to play
+        let audioIndex = 0;
+        
         if (index === 0) {
-            // Make sure to pause any currently playing audio first
-            if (lastPlayedAudioIndex >= 0) {
-                audioElements[lastPlayedAudioIndex].pause();
-            }
-            audioElements[0].currentTime = 0; // Reset to beginning
-            const playPromise = audioElements[0].play();
-            
-            // Handle play promise (modern browsers return a promise from play())
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error('Error playing w1.mp3:', error);
-                    // Try one more time after a short delay
-                    setTimeout(() => {
-                        audioElements[0].play().catch(e => 
-                            console.error('Second attempt to play w1.mp3 failed:', e)
-                        );
-                    }, 100);
-                });
-            }
-            lastPlayedAudioIndex = 0;
+            // First word always plays w1.mp3
+            audioIndex = 0;
         } else {
             // For other words, randomly select from w2-w9
-            // But avoid the last played audio
-            let randomIndex;
+            // But avoid the last played audio if possible
+            let attempts = 0;
             do {
-                randomIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
-            } while (randomIndex === lastPlayedAudioIndex);
-            
-            // Make sure to pause any currently playing audio first
-            if (lastPlayedAudioIndex >= 0) {
-                audioElements[lastPlayedAudioIndex].pause();
+                audioIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
+                attempts++;
+                // Break after 3 attempts to avoid infinite loop
+                if (attempts > 3) break;
+            } while (audioIndex === lastPlayedAudioIndex && audioElements.length > 2);
+        }
+        
+        // Make sure all audio is stopped
+        audioElements.forEach(audio => {
+            if (!audio.paused) {
+                audio.pause();
+                audio.currentTime = 0;
             }
+        });
+        
+        // Create a new Audio element for more reliable playback
+        const audioToPlay = new Audio(`audio/w${audioIndex+1}.mp3`);
+        
+        audioToPlay.oncanplaythrough = () => {
+            const playPromise = audioToPlay.play();
             
-            audioElements[randomIndex].currentTime = 0; // Reset to beginning
-            const playPromise = audioElements[randomIndex].play();
-            
-            // Handle play promise (modern browsers return a promise from play())
             if (playPromise !== undefined) {
                 playPromise.catch(error => {
-                    console.error(`Error playing w${randomIndex+1}.mp3:`, error);
-                    // Try one more time after a short delay
-                    setTimeout(() => {
-                        audioElements[randomIndex].play().catch(e => 
-                            console.error(`Second attempt to play w${randomIndex+1}.mp3 failed:`, e)
-                        );
-                    }, 100);
+                    console.error(`Error playing w${audioIndex+1}.mp3:`, error);
+                    
+                    // If the specific audio file fails, try a different one
+                    if (audioElements.length > 1) {
+                        const fallbackIndex = (audioIndex + 1) % audioElements.length;
+                        console.log(`Trying fallback audio w${fallbackIndex+1}.mp3`);
+                        
+                        setTimeout(() => {
+                            const fallbackAudio = new Audio(`audio/w${fallbackIndex+1}.mp3`);
+                            fallbackAudio.play().catch(e => 
+                                console.error(`Fallback audio w${fallbackIndex+1}.mp3 also failed:`, e)
+                            );
+                        }, 100);
+                    }
                 });
             }
-            lastPlayedAudioIndex = randomIndex;
-        }
+        };
+        
+        audioToPlay.onerror = (error) => {
+            console.error(`Error loading w${audioIndex+1}.mp3:`, error);
+        };
+        
+        lastPlayedAudioIndex = audioIndex;
     } catch (error) {
         console.error('Unexpected error in playWordAudio:', error);
     }
