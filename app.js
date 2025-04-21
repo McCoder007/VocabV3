@@ -72,22 +72,61 @@ function preloadAudioFiles() {
 
 // Function to play audio for the current word
 function playWordAudio(index) {
-    // First word always plays w1.mp3
-    if (index === 0) {
-        audioElements[0].currentTime = 0; // Reset to beginning
-        audioElements[0].play();
-        lastPlayedAudioIndex = 0;
-    } else {
-        // For other words, randomly select from w2-w9
-        // But avoid the last played audio
-        let randomIndex;
-        do {
-            randomIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
-        } while (randomIndex === lastPlayedAudioIndex);
-        
-        audioElements[randomIndex].currentTime = 0; // Reset to beginning
-        audioElements[randomIndex].play();
-        lastPlayedAudioIndex = randomIndex;
+    try {
+        // First word always plays w1.mp3
+        if (index === 0) {
+            // Make sure to pause any currently playing audio first
+            if (lastPlayedAudioIndex >= 0) {
+                audioElements[lastPlayedAudioIndex].pause();
+            }
+            audioElements[0].currentTime = 0; // Reset to beginning
+            const playPromise = audioElements[0].play();
+            
+            // Handle play promise (modern browsers return a promise from play())
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error('Error playing w1.mp3:', error);
+                    // Try one more time after a short delay
+                    setTimeout(() => {
+                        audioElements[0].play().catch(e => 
+                            console.error('Second attempt to play w1.mp3 failed:', e)
+                        );
+                    }, 100);
+                });
+            }
+            lastPlayedAudioIndex = 0;
+        } else {
+            // For other words, randomly select from w2-w9
+            // But avoid the last played audio
+            let randomIndex;
+            do {
+                randomIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
+            } while (randomIndex === lastPlayedAudioIndex);
+            
+            // Make sure to pause any currently playing audio first
+            if (lastPlayedAudioIndex >= 0) {
+                audioElements[lastPlayedAudioIndex].pause();
+            }
+            
+            audioElements[randomIndex].currentTime = 0; // Reset to beginning
+            const playPromise = audioElements[randomIndex].play();
+            
+            // Handle play promise (modern browsers return a promise from play())
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error(`Error playing w${randomIndex+1}.mp3:`, error);
+                    // Try one more time after a short delay
+                    setTimeout(() => {
+                        audioElements[randomIndex].play().catch(e => 
+                            console.error(`Second attempt to play w${randomIndex+1}.mp3 failed:`, e)
+                        );
+                    }, 100);
+                });
+            }
+            lastPlayedAudioIndex = randomIndex;
+        }
+    } catch (error) {
+        console.error('Unexpected error in playWordAudio:', error);
     }
 }
 
