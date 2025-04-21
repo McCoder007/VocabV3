@@ -10,29 +10,68 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Header / Reset Area -->
+        <div class="app-header">
+            <h1 class="app-title">Vocabulary Flashcards</h1>
+            <button id="reset-button" class="reset-button" title="Reset All Word Progress">Reset All</button>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div id="tab-container" class="tab-container hidden">
+            <button id="tab-flashcards" class="tab-button active">Flashcards</button>
+            <button id="tab-learning" class="tab-button">Learning</button>
+            <button id="tab-known" class="tab-button">Known</button>
+        </div>
+
         <!-- Start Screen -->
         <div id="start-screen" class="start-screen">
-            <h1>Vocabulary Flashcards</h1>
             <p>Click start to begin learning!</p>
             <button id="start-button" class="start-button">Start Learning</button>
         </div>
 
-        <!-- Vocabulary Card (initially hidden) -->
-        <div id="vocabulary-card" class="vocabulary-card card-hidden">
-            <div class="image-container">
-                <img id="vocab-image" src="" alt="Vocabulary image">
-            </div>
-            <div class="translations-container">
-                <div id="countdown-bar" class="countdown-bar">
-                    <div class="countdown-progress"></div>
+        <!-- == Main Views Wrapper == -->
+        <div id="view-container">
+            <!-- Vocabulary Card (Flashcard View) -->
+            <div id="vocabulary-card" class="vocabulary-card card-hidden">
+                <!-- Progress Label -->
+                <div id="progress-label" class="progress-label">Words Learned: 0%</div> 
+                <!-- Progress Bar Placeholder -->
+                <div id="progress-bar-container" class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
                 </div>
-                <div class="translations hidden" id="translations">
-                    <div class="english-word" id="english-word"></div>
-                    <div class="chinese-word" id="chinese-word"></div>
+                <div class="image-container">
+                    <img id="vocab-image" src="" alt="Vocabulary image">
+                </div>
+                <div class="translations-container">
+                    <div id="countdown-bar" class="countdown-bar">
+                        <div class="countdown-progress"></div>
+                    </div>
+                    <div class="translations hidden" id="translations">
+                        <div class="english-word" id="english-word"></div>
+                        <div class="chinese-word" id="chinese-word"></div>
+                    </div>
+                    <!-- Action Buttons (Moved Inside) -->
+                    <div id="action-buttons" class="action-buttons hidden">
+                        <button id="still-learning-button" class="action-button still-learning">🤔 Still learning</button>
+                        <button id="got-it-button" class="action-button got-it">🎉 Got it</button>
+                    </div>
                 </div>
             </div>
-            <button id="next-button" class="next-button">Next</button>
+
+            <!-- Learning List View -->
+            <div id="learning-list-view" class="list-view hidden">
+                <h2>Words Still Learning</h2>
+                <ul id="learning-list-ul"></ul>
+            </div>
+
+            <!-- Known List View -->
+            <div id="known-list-view" class="list-view hidden">
+                <h2>Words You Know</h2>
+                <ul id="known-list-ul"></ul>
+            </div>
         </div>
+        <!-- == End Main Views Wrapper == -->
+
     </div>
 
     <script src="config.js"></script>

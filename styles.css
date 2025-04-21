@@ -55,12 +55,12 @@ body {
 .translations-container {
     position: relative;
     width: 100%;
-    min-height: 160px;
+    min-height: 210px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 15px 0;
+    justify-content: space-between;
+    padding: 15px 0 10px 0;
 }
 
 .countdown-bar {
@@ -113,20 +113,83 @@ body {
     color: #666;
 }
 
-.next-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #3498db;
-    color: white;
+/* Styles for Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s linear;
+}
+
+.action-buttons.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: visibility 0s linear 0.3s, opacity 0.3s linear;
+    /* Ensure it doesn't take up space when hidden */
+    /* If issues persist, uncomment display: none */
+    /* display: none; */ 
+}
+
+.action-button {
+    padding: 10px 15px;
+    font-size: 0.9rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-basis: 45%; /* Give buttons a base width */
+    text-align: center;
 }
 
-.next-button:hover {
-    background-color: #2980b9;
+.action-button:active {
+    transform: scale(0.95); /* Slight press effect */
+}
+
+.still-learning {
+    background-color: #f0ad4e; /* Orange */
+    color: white;
+}
+
+.still-learning:hover {
+    background-color: #ec971f;
+}
+
+.got-it {
+    background-color: #5cb85c; /* Green */
+    color: white;
+}
+
+.got-it:hover {
+    background-color: #4cae4c;
+}
+
+/* Styles for Progress Bar */
+.progress-label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 5px; /* Space between label and bar */
+    text-align: center; /* Center the text */
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 15px; /* Space below progress bar */
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Start with 0% progress */
+    background-color: #5cb85c; /* Green for progress */
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out;
 }
 
 @media (max-width: 480px) {
@@ -145,6 +208,11 @@ body {
     .chinese-word {
         font-size: 20px;
     }
+    
+    .action-button {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+    }
 }
 
 /* Add styles for the start screen */
@@ -152,40 +220,165 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px;
+    justify-content: center; /* Center vertically */
+    padding: 40px; /* Adjusted padding */
     background-color: #fff;
     border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     text-align: center;
+    min-height: 350px; /* Adjusted min-height */
+    /* border: 1px solid red; */ /* Debug */
 }
 
-.start-screen h1 {
-    margin-bottom: 15px;
-    color: #333;
+/* Removed .start-icon styles */
+/*
+.start-icon {
+    font-size: 5rem; 
+    margin-bottom: 25px;
+    line-height: 1; 
 }
+*/
 
 .start-screen p {
-    margin-bottom: 25px;
-    color: #666;
+    margin-bottom: 30px; /* Adjusted spacing */
+    color: #555; 
+    font-size: 1.1rem; 
+    line-height: 1.6; 
+    max-width: 80%; /* Prevent text getting too wide */
 }
 
 .start-button {
-    padding: 12px 25px;
-    font-size: 1rem;
-    background-color: #5cb85c; /* Green */
+    padding: 15px 35px; 
+    font-size: 1.1rem; 
+    font-weight: 500; 
+    background-color: #5cb85c; 
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px; 
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 .start-button:hover {
     background-color: #4cae4c;
+    transform: scale(1.03); /* Slight grow effect on hover */
+}
+
+.start-button:active {
+    transform: scale(0.98); /* Press effect */
 }
 
 /* Utility class to hide elements */
-/* .hidden {
+.hidden {
     display: none !important;
-} */ 
+}
+
+/* Styles for App Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Space below header */
+    padding: 0 5px; /* Add some padding if needed */
+}
+
+.app-title {
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #333;
+    margin: 0; /* Remove default margin */
+}
+
+.reset-button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    background-color: #d9534f; /* Red */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.reset-button:hover {
+    background-color: #c9302c;
+}
+
+/* Tab Navigation Styles */
+.tab-container {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #eee;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.tab-button {
+    flex-grow: 1;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab-button.active {
+    background-color: #fff;
+    color: #333;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* List View Styles */
+.list-view {
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    /* Ensure lists don't expand beyond the view container */
+    max-height: 650px; /* Slightly less than container min-height */
+    overflow-y: auto; /* Add scroll if list is too long */
+}
+
+.list-view h2 {
+    font-size: 1.1rem;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.list-view ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-view li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.list-view li:last-child {
+    border-bottom: none;
+}
+
+.list-view span {
+    font-size: 1rem;
+}
+
+/* View Container Style */
+#view-container {
+    position: relative; 
+    /* min-height: 720px; */ /* Removed - will be set by JS */
+    /* border: 1px dashed blue; */
+} 

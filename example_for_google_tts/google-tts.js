@@ -278,5 +278,5 @@ class GoogleTTSManager {
     }
 }
 
-// Initialize Google TTS
-const googleTTS = new GoogleTTSManager();
+// Initialize Google TTS - REMOVED (will be initialized in app.js after DOM load)
+// const googleTTS = new GoogleTTSManager();
