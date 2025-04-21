@@ -103,27 +103,27 @@ body {
 
 .translations {
     position: absolute;
-    top: 10px; /* Position below countdown bar */
+    top: 10px; 
     left: 0;
     right: 0;
-    height: 130px; /* Approx height for text - Adjust */
+    height: 130px; 
     text-align: center;
-    display: flex; /* Use flex to center text vertically within its area */
+    display: flex; 
     flex-direction: column;
     justify-content: center;
     width: 100%;
-    /* padding-top: 10px; */ /* Removed */
-    opacity: 0; /* Start hidden */
-    visibility: hidden; /* Start hidden */
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
+    opacity: 1; /* Changed back to 1 (visible state) */
+    visibility: visible; /* Changed back to visible (visible state) */
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; /* Adjust transition delay */
     /* Removed min-height */
-    /* border: 1px dashed blue; */ /* Debug */
+    /* border: 1px dashed blue; */
 }
 
-/* Keep the override */
+/* This rule now correctly applies the hidden state */
 .translations.hidden {
     opacity: 0;
     visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0s; /* Hide visibility immediately */
 }
 
 .english-word {
@@ -141,27 +141,28 @@ body {
 /* Styles for Action Buttons */
 .action-buttons {
     position: absolute;
-    bottom: 10px; /* Position near bottom */
+    bottom: 10px; 
     left: 0;
     right: 0;
     display: flex;
     justify-content: space-around;
     width: 100%;
-    padding: 0 15px; /* Add padding */
+    padding: 0 15px; 
     box-sizing: border-box;
-    opacity: 0; /* Start hidden */
-    visibility: hidden; /* Start hidden */
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
-    /* margin-top: 10px; */ /* Removed */
+    opacity: 1; /* Changed back to 1 (visible state) */
+    visibility: visible; /* Changed back to visible (visible state) */
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; /* Adjust transition delay */
+    /* Removed margin-top */
     /* Removed min-height */
     flex-shrink: 0; 
-    /* border: 1px dashed green; */ /* Debug */
+    /* border: 1px dashed green; */
 }
 
-/* Keep the override */
+/* This rule now correctly applies the hidden state */
 .action-buttons.hidden {
     opacity: 0;
     visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0s; /* Hide visibility immediately */
 }
 
 .action-button {
