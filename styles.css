@@ -17,6 +17,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 10px; /* Add padding to body to prevent container touching edges */
+    padding-top: env(safe-area-inset-top, 10px); /* Add safe area inset for iOS notch */
+    padding-bottom: env(safe-area-inset-bottom, 10px); /* Add safe area inset for iOS bottom */
     box-sizing: border-box;
 }
 
@@ -204,6 +206,7 @@ body {
     color: #555;
     margin-bottom: 5px; /* Space between label and bar */
     text-align: center; /* Center the text */
+    margin-top: 5px; /* Add a little space at top */
 }
 
 .progress-bar-container {
@@ -213,6 +216,7 @@ body {
     border-radius: 4px;
     margin-bottom: 15px; /* Space below progress bar */
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Add subtle inner shadow */
 }
 
 .progress-bar {
@@ -221,11 +225,22 @@ body {
     background-color: #5cb85c; /* Green for progress */
     border-radius: 4px;
     transition: width 0.5s ease-in-out;
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.3); /* Subtle highlight */
 }
 
 @media (max-width: 480px) {
     .app-container {
-        padding: 10px;
+        padding: 0;
+        border-radius: 0; /* No rounded corners on phone */
+        height: 100%;
+    }
+    
+    body {
+        padding: 0; /* Remove body padding on phone */
+    }
+    
+    .app-header {
+        padding-top: env(safe-area-inset-top, 15px); /* Use safe area inset for notch */
     }
     
     .vocabulary-card {
@@ -243,6 +258,25 @@ body {
     .action-button {
         font-size: 0.8rem;
         padding: 8px 10px;
+    }
+}
+
+/* iPhone-specific tweaks */
+@media only screen 
+and (device-width: 390px) 
+and (device-height: 844px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (device-width: 428px) 
+and (device-height: 926px) 
+and (-webkit-device-pixel-ratio: 3),
+only screen 
+and (device-width: 430px) 
+and (device-height: 932px) 
+and (-webkit-device-pixel-ratio: 3) {
+    /* iPhone 12/13/14/15 Pro and Pro Max models */
+    .image-container {
+        min-height: 200px; /* Ensure enough space for image */
     }
 }
 
@@ -310,14 +344,15 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px; /* Space below header */
-    padding: 0 5px; /* Add some padding if needed */
+    padding: 15px 15px 10px;
+    padding-top: max(15px, env(safe-area-inset-top, 15px)); /* Use the larger of standard padding or safe area inset */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .app-title {
-    font-size: 1.5rem; /* Adjust size as needed */
+    font-size: 1.5rem;
+    font-weight: bold;
     color: #333;
-    margin: 0; /* Remove default margin */
 }
 
 .reset-button {
@@ -338,34 +373,35 @@ body {
 /* Tab Navigation Styles */
 .tab-container {
     display: flex;
-    margin-bottom: 15px;
-    background-color: #eee;
-    border-radius: 8px;
-    padding: 5px;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin: 0 15px 10px;
+    overflow: hidden;
 }
 
 .tab-button {
-    flex-grow: 1;
-    padding: 8px 10px;
-    font-size: 0.9rem;
-    text-align: center;
-    background-color: transparent;
+    flex: 1;
+    padding: 10px;
     border: none;
-    border-radius: 6px;
+    background: transparent;
+    color: #666;
+    font-size: 0.9rem;
     cursor: pointer;
-    color: #555;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: all 0.2s ease;
+    text-align: center;
+    border-bottom: 2px solid transparent;
 }
 
 .tab-button:hover {
-    background-color: #ddd;
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 .tab-button.active {
-    background-color: #fff;
-    color: #333;
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #3498db;
+    background-color: rgba(52, 152, 219, 0.05);
+    border-bottom: 2px solid #3498db;
+    font-weight: bold;
 }
 
 /* List View Styles */
