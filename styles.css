@@ -75,13 +75,14 @@ body {
 .translations-container {
     position: relative;
     width: 100%;
-    /* min-height: 210px; */ /* Remove fixed min-height */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; 
-    padding: 10px 0 5px 0; /* Reduced padding */
-    flex-shrink: 0; /* Prevent this container from shrinking */
+    justify-content: center; /* Center content vertically */
+    padding: 10px 0 5px 0; 
+    flex-shrink: 0; 
+    flex-grow: 1; /* Allow this container to take vertical space */
+    /* border: 1px solid red; */ /* Debug */
 }
 
 .countdown-bar {
@@ -105,16 +106,17 @@ body {
 
 .translations {
     text-align: center;
-    flex-grow: 1;
+    flex-grow: 1; /* Allow this to take up middle space */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: center; /* Center text within its area */
     width: 100%;
     padding-top: 10px;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
-    min-height: 80px; /* Reserve minimum space for text */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; 
+    min-height: 90px; /* Increased min-height slightly */
+    /* border: 1px dashed blue; */ /* Debug */
 }
 
 .translations.hidden {
@@ -146,7 +148,9 @@ body {
     visibility: visible;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Smooth transition */
     margin-top: 10px; 
-    min-height: 45px; /* Reserve minimum space for buttons */
+    min-height: 50px; /* Increased min-height slightly */
+    flex-shrink: 0; /* Prevent buttons shrinking */
+    /* border: 1px dashed green; */ /* Debug */
 }
 
 .action-buttons.hidden {
