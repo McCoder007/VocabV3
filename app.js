@@ -96,53 +96,36 @@ function playWordAudio(index) {
             audioIndex = 0;
         } else {
             // For other words, randomly select from w2-w9
-            // But avoid the last played audio if possible
-            let attempts = 0;
-            do {
-                audioIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
-                attempts++;
-                // Break after 3 attempts to avoid infinite loop
-                if (attempts > 3) break;
-            } while (audioIndex === lastPlayedAudioIndex && audioElements.length > 2);
+            audioIndex = 1 + Math.floor(Math.random() * 8); // Random index 1-8 (w2-w9)
         }
         
-        // Make sure all audio is stopped
-        audioElements.forEach(audio => {
-            if (!audio.paused) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-        });
+        console.log(`Attempting to play audio w${audioIndex+1}.mp3`);
         
-        // Create a new Audio element for more reliable playback
-        const audioToPlay = new Audio(`audio/w${audioIndex+1}.mp3`);
+        // Simple direct approach - create and play immediately
+        const audioPath = `audio/w${audioIndex+1}.mp3`;
+        const audio = new Audio(audioPath);
         
-        audioToPlay.oncanplaythrough = () => {
-            const playPromise = audioToPlay.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error(`Error playing w${audioIndex+1}.mp3:`, error);
-                    
-                    // If the specific audio file fails, try a different one
-                    if (audioElements.length > 1) {
-                        const fallbackIndex = (audioIndex + 1) % audioElements.length;
-                        console.log(`Trying fallback audio w${fallbackIndex+1}.mp3`);
-                        
-                        setTimeout(() => {
-                            const fallbackAudio = new Audio(`audio/w${fallbackIndex+1}.mp3`);
-                            fallbackAudio.play().catch(e => 
-                                console.error(`Fallback audio w${fallbackIndex+1}.mp3 also failed:`, e)
-                            );
-                        }, 100);
-                    }
-                });
-            }
-        };
+        // Start playing immediately
+        const playPromise = audio.play();
         
-        audioToPlay.onerror = (error) => {
-            console.error(`Error loading w${audioIndex+1}.mp3:`, error);
-        };
+        // Handle any errors
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.error(`Error playing ${audioPath}:`, error);
+                
+                // Try alternative audio file if this one fails
+                const fallbackIndex = (audioIndex + 1) % 9; // Try the next audio file
+                const fallbackPath = `audio/w${fallbackIndex+1}.mp3`;
+                console.log(`Trying fallback audio ${fallbackPath}`);
+                
+                // Simple fallback
+                setTimeout(() => {
+                    new Audio(fallbackPath).play().catch(e => {
+                        console.error(`Fallback audio also failed:`, e);
+                    });
+                }, 100);
+            });
+        }
         
         lastPlayedAudioIndex = audioIndex;
     } catch (error) {
