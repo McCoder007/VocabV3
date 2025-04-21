@@ -53,16 +53,15 @@ body {
 
 .image-container {
     width: 100%;
-    /* aspect-ratio: 1; */ /* Remove fixed aspect ratio */
-    margin-bottom: 10px; /* Reduced margin */
+    margin-bottom: 10px; 
     border-radius: 10px;
     overflow: hidden;
-    flex-grow: 1; /* Allow image container to grow */
-    flex-shrink: 1; /* Allow image container to shrink */
-    display: flex; /* Center image inside */
+    flex-grow: 1; /* Keep this - allows image area to take up slack */
+    flex-shrink: 1; 
+    display: flex; 
     align-items: center;
     justify-content: center;
-    min-height: 150px; /* Prevent collapsing too much */
+    min-height: 150px; 
 }
 
 #vocab-image {
@@ -78,11 +77,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Center content vertically */
+    justify-content: center; 
     padding: 10px 0 5px 0; 
     flex-shrink: 0; 
-    flex-grow: 1; 
-    /* min-height: ?px; */ /* Removed - JS will handle */
+    /* flex-grow: 1; */ /* Remove this - let it take natural height + min-height */
+    /* min-height: ?px; */ 
 }
 
 .countdown-bar {
