@@ -473,4 +473,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // --- End Flashcard Button Listeners ---
 
+    // Add touch/click event listener to speak the word again when translations are visible
+    translations.addEventListener('click', () => {
+        // Only speak if translations are already visible (after countdown)
+        if (!translations.classList.contains('hidden') && !isTransitioning) {
+            const currentWord = vocabularyData[currentWordIndex];
+            if (currentWord) {
+                googleTTS.speak(currentWord.english);
+                console.log(`Speaking word again: "${currentWord.english}"`);
+            }
+        }
+    });
+
 }); 
