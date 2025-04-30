@@ -9,8 +9,6 @@ const englishWord = document.getElementById('english-word');
 const chineseWord = document.getElementById('chinese-word');
 const translations = document.getElementById('translations');
 const countdownProgress = document.querySelector('.countdown-progress');
-const startScreen = document.getElementById('start-screen');
-const startButton = document.getElementById('start-button');
 const vocabularyCard = document.getElementById('vocabulary-card');
 const actionButtons = document.getElementById('action-buttons');
 const stillLearningButton = document.getElementById('still-learning-button');
@@ -22,8 +20,14 @@ const resetButton = document.getElementById('reset-button');
 const appTitle = document.querySelector('.app-title');
 const viewContainer = document.getElementById('view-container'); // Added view container
 
+// Sets Menu Elements
+const setsMenu = document.getElementById('sets-menu');
+const setsList = document.getElementById('sets-list');
+const backToStartButton = document.getElementById('back-to-start');
+
 // Tab and List View Elements
 const tabContainer = document.getElementById('tab-container');
+const backToSetsButton = document.getElementById('back-to-sets');
 const tabFlashcards = document.getElementById('tab-flashcards');
 const tabLearning = document.getElementById('tab-learning');
 const tabKnown = document.getElementById('tab-known');
@@ -34,6 +38,7 @@ const knownListUl = document.getElementById('known-list-ul');
 
 // Constants for localStorage
 const LOCAL_STORAGE_KEY = 'vocabProgressV3';
+const ACTIVE_SET_KEY = 'activeVocabSetV3';
 
 // State
 let currentWordIndex = 0;
@@ -41,6 +46,7 @@ let countdownTimeout;
 let isTransitioning = false;
 let audioElements = []; // Array to store preloaded audio elements
 let lastPlayedAudioIndex = -1; // Keep track of the last played audio index
+let activeSetId = null; // Track which set is currently active
 
 // Function to update the progress bar and label
 function updateProgressBar() {
@@ -48,11 +54,11 @@ function updateProgressBar() {
     const knownWords = vocabularyData.filter(word => word.status === 'known').length;
     const progressPercentage = totalWords > 0 ? Math.round((knownWords / totalWords) * 100) : 0;
     
-    // Update progress bar width
+    // Update progress bar width (still using percentage for the visual bar)
     progressBar.style.width = `${progressPercentage}%`;
     
-    // Update progress label text
-    progressLabel.textContent = `Words Learned: ${progressPercentage}%`;
+    // Update progress label text to show count instead of percentage
+    progressLabel.textContent = `Words Learned: ${knownWords}/${totalWords}`;
 
     // Keep console log for debugging if needed
     // console.log(`Progress: ${knownWords}/${totalWords} (${progressPercentage}%)`);
@@ -144,22 +150,18 @@ function preloadImages() {
 }
 
 function setupStartScreen() {
-    // Ensure initial state: tabs and card hidden, start screen shown
+    // Ensure initial state: tabs and card hidden
     tabContainer.classList.add('hidden');
     vocabularyCard.classList.add('card-hidden');
     learningListView.classList.add('hidden');
     knownListView.classList.add('hidden');
-    startScreen.style.display = 'flex'; // Make sure start screen is flex
+    
+    // Show sets menu directly
+    showSetsMenu();
 
-    // Add listener to the start button
-    startButton.addEventListener('click', () => {
-        startScreen.style.display = 'none'; 
-        tabContainer.classList.remove('hidden'); 
-        vocabularyCard.classList.remove('card-hidden'); 
-        setActiveTab(tabFlashcards);
-        
-        // Initialize word logic AFTER showing the card
-        initAppLogic(); 
+    // Refresh button listener
+    backToStartButton.addEventListener('click', () => {
+        showSetsMenu(); // Just refresh the sets menu
     });
 }
 
@@ -223,78 +225,165 @@ function populateKnownList() {
     });
 }
 
+// Function to display the sets menu
+function showSetsMenu() {
+    console.log('Showing sets menu - clearing existing buttons');
+    // Clear existing set buttons
+    setsList.innerHTML = '';
+    
+    console.log('Creating buttons for each set - vocabularySets:', vocabularySets);
+    // Create buttons for each vocabulary set
+    vocabularySets.forEach(set => {
+        const setButton = document.createElement('button');
+        setButton.classList.add('set-button');
+        setButton.dataset.setId = set.id;
+        
+        const wordCount = set.words.length;
+        
+        // Create inner structure for the set button
+        setButton.innerHTML = `
+            <span class="set-name">${set.name}</span>
+            <span class="word-count">${wordCount} words</span>
+        `;
+        
+        // Add click event to load the selected set
+        setButton.addEventListener('click', () => {
+            loadVocabularySet(set.id);
+        });
+        
+        setsList.appendChild(setButton);
+    });
+    
+    console.log('Removing hidden class from sets menu');
+    // Show the sets menu
+    setsMenu.classList.remove('hidden');
+}
+
+// Function to load a specific vocabulary set
+function loadVocabularySet(setId) {
+    // Find the selected set
+    const selectedSet = vocabularySets.find(set => set.id === setId);
+    
+    if (!selectedSet) {
+        console.error(`Vocabulary set with ID ${setId} not found`);
+        return;
+    }
+    
+    // Update active set ID
+    activeSetId = setId;
+    
+    // Save active set to localStorage
+    localStorage.setItem(ACTIVE_SET_KEY, activeSetId);
+    
+    // Load vocabulary data from the selected set
+    vocabularyData = [...selectedSet.words];
+    
+    // Load progress from localStorage
+    loadProgress();
+    
+    // Hide sets menu
+    setsMenu.classList.add('hidden');
+    
+    // Show tabs and vocabulary card
+    tabContainer.classList.remove('hidden');
+    vocabularyCard.classList.remove('card-hidden');
+    setActiveTab(tabFlashcards);
+    
+    // Initialize app logic
+    initAppLogic();
+}
+
 // Function to save progress to localStorage
 function saveProgress() {
-    // Store only the status of each word, keyed by English word for robustness
-    const progressToSave = {};
-    vocabularyData.forEach((word, index) => {
-        // Use English word as key, or index as fallback if needed
-        const key = word.english || `word_${index}`; 
-        progressToSave[key] = word.status;
-    });
+    if (!activeSetId) return;
+    
     try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progressToSave));
-        console.log('Progress saved to localStorage');
+        // Create object to store set-specific progress
+        const progressData = {
+            setId: activeSetId,
+            words: vocabularyData.map(word => ({
+                english: word.english,
+                status: word.status
+            }))
+        };
+        
+        // Store in localStorage with set-specific key
+        const storageKey = `${LOCAL_STORAGE_KEY}_${activeSetId}`;
+        localStorage.setItem(storageKey, JSON.stringify(progressData));
+        
+        console.log(`Progress saved for set ${activeSetId}`);
     } catch (e) {
-        console.error('Failed to save progress to localStorage:', e);
+        console.error('Error saving progress:', e);
     }
 }
 
 // Function to load progress from localStorage
 function loadProgress() {
+    if (!activeSetId) return;
+    
     try {
-        const savedProgress = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedProgress) {
-            const parsedProgress = JSON.parse(savedProgress);
-            console.log('Loading progress from localStorage...');
-            let loadedCount = 0;
-            vocabularyData.forEach((word, index) => {
-                const key = word.english || `word_${index}`;
-                if (parsedProgress[key]) {
-                    word.status = parsedProgress[key];
-                    loadedCount++;
-                }
-                // else: keep default 'new' status
-            });
-            console.log(`Loaded status for ${loadedCount} words.`);
+        // Get set-specific progress from localStorage
+        const storageKey = `${LOCAL_STORAGE_KEY}_${activeSetId}`;
+        const savedData = localStorage.getItem(storageKey);
+        
+        if (savedData) {
+            const progressData = JSON.parse(savedData);
+            
+            // Update status for matching words
+            if (progressData.words && progressData.words.length > 0) {
+                progressData.words.forEach(savedWord => {
+                    const wordToUpdate = vocabularyData.find(word => word.english === savedWord.english);
+                    if (wordToUpdate) {
+                        wordToUpdate.status = savedWord.status;
+                    }
+                });
+            }
+            
+            console.log(`Progress loaded for set ${activeSetId}`);
         } else {
-            console.log('No saved progress found.');
+            console.log(`No saved progress found for set ${activeSetId}`);
         }
     } catch (e) {
-        console.error('Failed to load or parse progress from localStorage:', e);
-        // Optional: Clear corrupted data
-        // localStorage.removeItem(LOCAL_STORAGE_KEY);
+        console.error('Error loading progress:', e);
     }
-}
-
-// Function to reset all progress
-function resetAllProgress() {
-    console.log('Resetting all progress...');
     
-    // 1. Clear localStorage & Reset data
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    vocabularyData.forEach(word => { word.status = 'new'; });
-    currentWordIndex = 0;
-    console.log('Cleared storage and reset statuses.');
-
-    // 2. Update progress bar data (won't be visible yet)
+    // Update progress bar based on loaded data
     updateProgressBar();
-
-    // 3. Reset UI to initial state
-    tabContainer.classList.add('hidden'); // Hide tabs
-    vocabularyCard.classList.add('card-hidden'); // Hide flashcard view
-    learningListView.classList.add('hidden'); // Hide learning list
-    knownListView.classList.add('hidden'); // Hide known list
-    startScreen.style.display = 'flex'; // Show start screen
-
-    // Clear any active timers
-    clearTimeout(countdownTimeout);
-    isTransitioning = false; 
-
-    console.log('All progress has been reset! Click Start Learning to begin.'); 
 }
 
-// Initialize the main app logic (called after start button)
+// Function to reset progress
+function resetAllProgress() {
+    if (!activeSetId) return;
+    
+    // Confirmation before resetting
+    if (!confirm('This will reset all progress for the current word set. Continue?')) {
+        return;
+    }
+    
+    // Reset all words in the current set to 'new' status
+    vocabularyData.forEach(word => {
+        word.status = 'new';
+    });
+    
+    // Update the progress bar to reflect reset
+    updateProgressBar();
+    
+    // Save the reset progress to localStorage
+    saveProgress();
+    
+    // Reset UI state
+    clearTimeout(countdownTimeout);
+    isTransitioning = false;
+    
+    // Return to the set menu
+    setsMenu.classList.remove('hidden');
+    tabContainer.classList.add('hidden');
+    vocabularyCard.classList.add('card-hidden');
+    
+    console.log(`All progress has been reset for set ${activeSetId}!`);
+}
+
+// Initialize the main app logic (called after set selection)
 function initAppLogic() {
     // Load progress from localStorage first
     loadProgress();
@@ -309,8 +398,17 @@ function initAppLogic() {
     // Initialize progress bar based on potentially loaded state
     updateProgressBar(); 
 
-    // Show the VERY FIRST word (index 0)
-    showSpecificWord(0);
+    // Get a random initial word instead of always starting with index 0
+    const randomInitialIndex = getRandomWordIndex();
+    showSpecificWord(randomInitialIndex);
+}
+
+// Helper function to get a random word index
+function getRandomWordIndex() {
+    if (!vocabularyData || vocabularyData.length === 0) {
+        return 0;
+    }
+    return Math.floor(Math.random() * vocabularyData.length);
 }
 
 // Function to show a specific word by index (used for initialization)
@@ -458,8 +556,30 @@ function showTranslations() {
 
 // Initialize the start screen setup and add tab listeners when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    setupStartScreen();
+    // Check if there was a previously active set
+    activeSetId = localStorage.getItem(ACTIVE_SET_KEY);
+    
+    // If there was a previously active set, load it
+    if (activeSetId) {
+        const selectedSet = vocabularySets.find(set => set.id === activeSetId);
+        if (selectedSet) {
+            // Load the words from the previously active set
+            vocabularyData = [...selectedSet.words];
+            // Load progress for this set
+            loadProgress();
+        } else {
+            // If the set wasn't found, clear the stored active set
+            localStorage.removeItem(ACTIVE_SET_KEY);
+            activeSetId = null;
+        }
+    }
 
+    // Initialize the Google TTS manager
+    googleTTS = new GoogleTTSManager();
+    
+    // Set up the start screen (which will show the sets menu)
+    setupStartScreen();
+    
     // Add listener for the reset button 
     const resetButtonElement = document.getElementById('reset-button');
     if (resetButtonElement) {
@@ -467,6 +587,19 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('Reset button not found!');
     }
+
+    // Add listener for the back to sets button
+    backToSetsButton.addEventListener('click', () => {
+        // Stop any running countdowns
+        clearTimeout(countdownTimeout);
+        
+        // Hide the flashcard interface
+        tabContainer.classList.add('hidden');
+        vocabularyCard.classList.add('card-hidden');
+        
+        // Show the sets menu
+        showSetsMenu();
+    });
 
     // --- Add Tab Button Listeners ---
     tabFlashcards.addEventListener('click', () => {
@@ -487,33 +620,39 @@ document.addEventListener('DOMContentLoaded', () => {
         populateKnownList();
         switchView(knownListView);
     });
-    // --- End Tab Button Listeners ---
 
-    // --- Moved Flashcard Button Listeners Here ---
-    // Ensure these are only active when the flashcard view is visible?
-    // No, state logic handles `isTransitioning` which prevents clicks during view switches.
+    // --- Add Button Listeners for Word Actions ---
     stillLearningButton.addEventListener('click', () => {
-        if (!isTransitioning) {
-            const shownWordIndex = currentWordIndex; 
-            vocabularyData[shownWordIndex].status = 'learning';
-            console.log(`Word "${vocabularyData[shownWordIndex].english}" marked as learning`);
-            updateProgressBar();
-            saveProgress(); 
-            showNextWord(); // This handles getting the next word
-        }
+        if (isTransitioning) return;
+        
+        // Update word status to 'learning'
+        vocabularyData[currentWordIndex].status = 'learning';
+        
+        // Save progress
+        saveProgress();
+        
+        // Update progress bar
+        updateProgressBar();
+        
+        // Show next word
+        showNextWord();
     });
 
     gotItButton.addEventListener('click', () => {
-        if (!isTransitioning) {
-            const shownWordIndex = currentWordIndex; 
-            vocabularyData[shownWordIndex].status = 'known';
-            console.log(`Word "${vocabularyData[shownWordIndex].english}" marked as known`);
-            updateProgressBar();
-            saveProgress(); 
-            showNextWord(); // This handles getting the next word
-        }
+        if (isTransitioning) return;
+        
+        // Update word status to 'known'
+        vocabularyData[currentWordIndex].status = 'known';
+        
+        // Save progress
+        saveProgress();
+        
+        // Update progress bar
+        updateProgressBar();
+        
+        // Show next word
+        showNextWord();
     });
-    // --- End Flashcard Button Listeners ---
 
     // Add touch/click event listener to speak the word again when translations are visible
     translations.addEventListener('click', () => {
@@ -526,5 +665,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
 }); 

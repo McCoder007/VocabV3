@@ -18,15 +18,19 @@
 
         <!-- Tab Navigation -->
         <div id="tab-container" class="tab-container hidden">
+            <button id="back-to-sets" class="tab-button back-tab"><i class="fas fa-chevron-left"></i> Back</button>
             <button id="tab-flashcards" class="tab-button active">Flashcards</button>
             <button id="tab-learning" class="tab-button">Learning</button>
             <button id="tab-known" class="tab-button">Known</button>
         </div>
 
-        <!-- Start Screen -->
-        <div id="start-screen" class="start-screen">
-            <p>Click start to begin learning!</p>
-            <button id="start-button" class="start-button">Start Learning</button>
+        <!-- Vocabulary Sets Menu -->
+        <div id="sets-menu" class="sets-menu hidden">
+            <h2>Choose a Weekly Set</h2>
+            <div id="sets-list" class="sets-list">
+                <!-- Sets will be added here programmatically -->
+            </div>
+            <button id="back-to-start" class="back-button">Refresh</button>
         </div>
 
         <!-- == Main Views Wrapper == -->

@@ -393,6 +393,20 @@ and (-webkit-device-pixel-ratio: 3) {
     border-bottom: 2px solid transparent;
 }
 
+.tab-button.back-tab {
+    flex: 0.8;
+    color: #3498db;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.tab-button.back-tab i {
+    font-size: 0.8rem;
+}
+
 .tab-button:hover {
     background-color: rgba(0, 0, 0, 0.03);
 }
@@ -461,4 +475,82 @@ and (-webkit-device-pixel-ratio: 3) {
     flex-grow: 0; 
     height: 0;
     overflow: hidden;
+} 
+
+/* Sets Menu Styles */
+.sets-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sets-menu h2 {
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.sets-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.set-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background-color: #5c6bc0;
+    color: white;
+    font-size: 1.2rem;
+    text-align: left;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.set-button:hover {
+    background-color: #3f51b5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.set-button .set-name {
+    font-weight: bold;
+}
+
+.set-button .word-count {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.back-button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #e0e0e0;
+    color: #333;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #d0d0d0;
 } 
